@@ -847,7 +847,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-5 relative">
+        <div className="flex-1 max-h-[70vh] overflow-y-auto p-3 sm:p-5 pb-20 relative">
             
             {/* PERSISTENT INFO BANNERS (Across Steps 1-3) */}
             {formData.poType === 'normal' && (
@@ -1126,7 +1126,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
         </div>
 
         {/* Footer */}
-        <div className={`p-5 border-t flex justify-between items-center ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+        <div className={`fixed bottom-4 left-0 right-0 z-[1000] px-3 sm:px-5 py-3 border-t shadow-lg flex justify-between items-center ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
             {step > 1 ? (
                 <button onClick={() => setStep(prev => prev - 1 as any)} className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-200'}`}>
                     <ArrowLeft size={20} /> Zurück
