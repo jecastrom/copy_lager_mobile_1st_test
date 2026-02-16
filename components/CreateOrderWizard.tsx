@@ -489,6 +489,12 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
   const supplierDropdownRef = useRef<HTMLDivElement>(null);
   const [supplierDropdownCoords, setSupplierDropdownCoords] = useState({ top: 0, left: 0, width: 0 });
 
+  // Supplier Bottom Sheet (mobile-first)
+  const [showSupplierSheet, setShowSupplierSheet] = useState(false);
+  const [supplierSheetSearch, setSupplierSheetSearch] = useState('');
+  const [showAddNewSupplier, setShowAddNewSupplier] = useState(false);
+  const [newSupplierName, setNewSupplierName] = useState('');
+
   // Search Dropdown
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -558,6 +564,11 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
     if (!formData.supplier) return suppliers;
     return suppliers.filter(s => s.toLowerCase().includes(formData.supplier.toLowerCase()));
   }, [suppliers, formData.supplier]);
+
+  const sheetFilteredSuppliers = useMemo(() => {
+    if (!supplierSheetSearch) return supplierOptions;
+    return supplierOptions.filter(s => s.toLowerCase().includes(supplierSheetSearch.toLowerCase()));
+  }, [supplierOptions, supplierSheetSearch]);
 
   const systems = useMemo(() => {
     const unique = new Set<string>();
@@ -742,30 +753,30 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
   }`;
 
   return (
-    <div className={`h-full flex flex-col rounded-2xl border overflow-hidden animate-in slide-in-from-right-8 duration-300 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-        
+    <div className={`h-full flex flex-col overflow-hidden animate-in fade-in duration-200 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+
         {/* SUCCESS / ERROR OVERLAY */}
         {(submissionStatus === 'success' || submissionStatus === 'error') && createPortal(
             <div className="fixed inset-0 z-[100000] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
                 {submissionStatus === 'success' && (
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 slide-in-from-bottom-4 duration-500">
+                    <div className={`rounded-3xl p-8 max-w-md w-full shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 slide-in-from-bottom-4 duration-500 ${isDark ? 'bg-slate-900 border border-slate-800' : 'bg-white border border-slate-200'}`}>
                         <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mb-6">
                             <CheckCircle2 size={48} className="text-emerald-600 dark:text-emerald-400" strokeWidth={3} />
                         </div>
-                        <h2 className="text-2xl font-bold mb-2 dark:text-white text-slate-900">
+                        <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                             {initialOrder ? 'Bestellung aktualisiert' : 'Bestellung erfolgreich erstellt'}
                         </h2>
-                        <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+                        <p className={`mb-8 leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                             Die Änderungen wurden gespeichert.
                         </p>
                         <div className="w-full space-y-3">
-                             <button 
+                             <button
                                 onClick={() => alert("Mock PDF Download gestartet...")}
-                                className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
                              >
                                 <Download size={18} /> PDF Herunterladen
                              </button>
-                             <button 
+                             <button
                                onClick={() => onNavigate('order-management')}
                                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/30 transition-all active:scale-95"
                              >
@@ -780,46 +791,45 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
         {/* IMPORT MODAL */}
         {showImportModal && createPortal(
-            <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[100000] flex items-end sm:items-center justify-center">
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowImportModal(false)} />
-                <div className={`relative w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 ${isDark ? 'bg-slate-900 border border-slate-700' : 'bg-white'}`}>
-                    <div className={`p-5 border-b flex justify-between items-center ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
-                        <h3 className={`font-bold text-lg flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                            <Sparkles size={20} className="text-[#0077B5]" /> Smart Import
+                <div className={`relative w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in slide-in-from-bottom duration-200 ${isDark ? 'bg-slate-900 border border-slate-700' : 'bg-white'}`}>
+                    <div className={`p-4 border-b flex justify-between items-center ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+                        <h3 className={`font-bold text-base flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                            <Sparkles size={18} className="text-[#0077B5]" /> Smart Import
                         </h3>
                         <button onClick={() => setShowImportModal(false)} className={`p-1 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}>
                             <X size={20} />
                         </button>
                     </div>
-                    <div className="p-6 space-y-4">
-                        <div className={`p-4 rounded-xl border flex gap-3 ${isDark ? 'bg-blue-900/10 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-700'}`}>
-                            <Info size={20} className="shrink-0" />
-                            <p className="text-sm leading-relaxed">
-                                Kopieren Sie den Text aus einer PDF oder E-Mail und fügen Sie ihn hier ein. 
-                                Wir versuchen automatisch <strong>Datum</strong>, <strong>Bestellnummer</strong> und <strong>Positionen</strong> zu erkennen.
+                    <div className="p-4 space-y-3">
+                        <div className={`p-3 rounded-xl border flex gap-2 ${isDark ? 'bg-blue-900/10 border-blue-500/20 text-blue-300' : 'bg-blue-50 border-blue-100 text-blue-700'}`}>
+                            <Info size={16} className="shrink-0 mt-0.5" />
+                            <p className="text-xs leading-relaxed">
+                                Text aus PDF/E-Mail einfügen. Wir erkennen automatisch <strong>Datum</strong>, <strong>Bestellnummer</strong> und <strong>Positionen</strong>.
                             </p>
                         </div>
-                        <textarea 
+                        <textarea
                             value={importText}
                             onChange={(e) => setImportText(e.target.value)}
-                            placeholder="Fügen Sie hier den Text aus dem PDF/Email ein..."
-                            className={`w-full p-4 rounded-xl border outline-none focus:ring-2 focus:ring-blue-500/30 min-h-[300px] resize-none font-mono text-sm transition-all ${isDark ? 'bg-slate-950 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
+                            placeholder="Text hier einfügen..."
+                            className={`w-full p-3 rounded-xl border outline-none focus:ring-2 focus:ring-blue-500/30 min-h-[200px] resize-none font-mono text-sm transition-all ${isDark ? 'bg-slate-950 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'}`}
                             autoFocus
                         />
                     </div>
-                    <div className={`p-5 border-t flex justify-end gap-3 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
-                        <button 
+                    <div className={`p-4 border-t flex justify-end gap-3 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+                        <button
                             onClick={() => setShowImportModal(false)}
-                            className={`px-5 py-2.5 rounded-xl font-bold transition-colors ${isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}
+                            className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-colors ${isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}
                         >
                             Abbrechen
                         </button>
-                        <button 
+                        <button
                             onClick={handleParseImport}
                             disabled={!importText.trim()}
-                            className="px-5 py-2.5 bg-[#0077B5] hover:bg-[#00A0DC] text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:shadow-none transition-all flex items-center gap-2"
+                            className="px-4 py-2.5 bg-[#0077B5] hover:bg-[#00A0DC] text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:shadow-none transition-all flex items-center gap-2"
                         >
-                            <Sparkles size={18} /> Analysieren & Übernehmen
+                            <Sparkles size={16} /> Übernehmen
                         </button>
                     </div>
                 </div>
@@ -827,328 +837,480 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
             document.body
         )}
 
-        {/* Title Bar */}
-        <div className={`p-5 border-b flex justify-between items-center ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-            <h2 className="text-xl font-bold flex items-center gap-2">
-            <FileText className="text-[#0077B5]" /> {initialOrder ? 'Bestellung bearbeiten' : 'Neue Bestellung'}
-            </h2>
-            <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm font-medium">
-                <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${step >= 1 ? 'bg-[#0077B5] text-white' : 'bg-slate-200 text-slate-500'}`}>1</span>
-                <div className={`w-4 h-0.5 ${step >= 2 ? 'bg-[#0077B5]' : 'bg-slate-200'}`} />
-                <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${step >= 2 ? 'bg-[#0077B5] text-white' : 'bg-slate-200 text-slate-500'}`}>2</span>
-                <div className={`w-4 h-0.5 ${step >= 3 ? 'bg-[#0077B5]' : 'bg-slate-200'}`} />
-                <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${step >= 3 ? 'bg-[#0077B5] text-white' : 'bg-slate-200 text-slate-500'}`}>3</span>
-            </div>
-            <button onClick={() => onNavigate('dashboard')} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
-                <X size={20} />
-            </button>
-            </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 max-h-[70vh] overflow-y-auto p-3 sm:p-5 pb-20 relative">
-            
-            {/* PERSISTENT INFO BANNERS (Across Steps 1-3) */}
-            {formData.poType === 'normal' && (
-                <div className={`rounded-lg p-3 mb-6 flex gap-3 items-start animate-in fade-in slide-in-from-top-1 ${isDark ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400' : 'bg-amber-50 border border-amber-200 text-amber-800'}`}>
-                    <AlertTriangle size={18} className="shrink-0 mt-0.5" />
-                    <p className="text-xs leading-relaxed">
-                        <strong>Lagerbestellung:</strong> Die Ware wird nach Wareneingang direkt dem Lagerbestand hinzugefügt.
-                    </p>
-                </div>
-            )}
-
-            {formData.poType === 'project' && (
-                <div className={`rounded-lg p-3 mb-6 flex gap-3 items-start animate-in fade-in slide-in-from-top-1 ${isDark ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400' : 'bg-blue-50 border border-blue-200 text-blue-800'}`}>
-                    <Info size={18} className="shrink-0 mt-0.5" />
-                    <p className="text-xs leading-relaxed">
-                        <strong>Projektbestellung:</strong> Ware wird reserviert. Das Technik-Team wird automatisch per E-Mail benachrichtigt, sobald die Ware zur Abholung bereitsteht.
-                    </p>
-                </div>
-            )}
-
-            {/* Step 1 Content */}
-            {step === 1 && (
-                <div className="max-w-xl mx-auto space-y-6 animate-in fade-in slide-in-from-right-4">
-                    
-                    {/* Header with Smart Import Button */}
-                    <div className="mb-4 flex items-center justify-between">
-                        <div>
-                            <h3 className="text-lg font-bold mb-1">Schritt 1: Kopfdaten</h3>
-                            <p className="text-sm opacity-70">Geben Sie die Basisdaten der Bestellung ein.</p>
+        {/* SUPPLIER BOTTOM SHEET */}
+        {showSupplierSheet && createPortal(
+            <div className="fixed inset-0 z-[100000]">
+                <div
+                    className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+                    onClick={() => { setShowSupplierSheet(false); setSupplierSheetSearch(''); setShowAddNewSupplier(false); }}
+                />
+                <div className={`absolute bottom-0 left-0 right-0 rounded-t-3xl max-h-[75vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-300 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+                    {/* Handle bar */}
+                    <div className="flex justify-center pt-3 pb-1">
+                        <div className={`w-10 h-1 rounded-full ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`} />
+                    </div>
+                    {/* Title */}
+                    <div className="px-5 pb-3">
+                        <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Lieferant wählen</h3>
+                    </div>
+                    {/* Search */}
+                    <div className="px-5 pb-3">
+                        <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                            <Search size={16} className="opacity-50 shrink-0" />
+                            <input
+                                type="text"
+                                value={supplierSheetSearch}
+                                onChange={(e) => setSupplierSheetSearch(e.target.value)}
+                                placeholder="Suchen..."
+                                className={`flex-1 bg-transparent outline-none text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}
+                                autoFocus
+                            />
                         </div>
-                        {enableSmartImport && !initialOrder && (
-                            <button 
-                                onClick={() => setShowImportModal(true)}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                                    isDark 
-                                    ? 'bg-transparent text-slate-400 border-slate-700 hover:text-white hover:border-slate-500' 
-                                    : 'bg-transparent text-slate-500 border-slate-300 hover:text-slate-800 hover:border-slate-400'
+                    </div>
+                    {/* Options list */}
+                    <div className="flex-1 overflow-y-auto">
+                        {sheetFilteredSuppliers.length > 0 ? (
+                            sheetFilteredSuppliers.map((opt, idx) => (
+                                <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => {
+                                        setFormData({...formData, supplier: opt});
+                                        setShowSupplierSheet(false);
+                                        setSupplierSheetSearch('');
+                                    }}
+                                    className={`w-full px-5 py-3.5 text-left text-sm transition-colors flex items-center justify-between border-b ${
+                                        formData.supplier === opt
+                                            ? isDark ? 'bg-blue-500/10 text-blue-400 border-blue-500/10' : 'bg-blue-50 text-blue-600 border-blue-50'
+                                            : isDark ? 'hover:bg-slate-800 border-slate-800/50' : 'hover:bg-slate-50 border-slate-100'
+                                    }`}
+                                >
+                                    <span className="font-medium">{opt}</span>
+                                    {formData.supplier === opt && <CheckCircle2 size={18} className="text-blue-500" />}
+                                </button>
+                            ))
+                        ) : (
+                            <div className="p-6 text-center text-sm opacity-50">Keine Ergebnisse</div>
+                        )}
+                    </div>
+                    {/* Add New Supplier */}
+                    <div className={`p-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+                        {!showAddNewSupplier ? (
+                            <button
+                                type="button"
+                                onClick={() => setShowAddNewSupplier(true)}
+                                className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
+                                    isDark ? 'bg-slate-800 hover:bg-slate-700 text-blue-400' : 'bg-slate-100 hover:bg-slate-200 text-blue-600'
                                 }`}
                             >
-                                <FileText size={14} /> Aus Text/PDF importieren
+                                <Plus size={16} /> Neuer Lieferant
+                            </button>
+                        ) : (
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newSupplierName}
+                                    onChange={(e) => setNewSupplierName(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && newSupplierName.trim()) {
+                                            setSupplierOptions(prev => [...prev, newSupplierName.trim()]);
+                                            setFormData({...formData, supplier: newSupplierName.trim()});
+                                            setNewSupplierName('');
+                                            setShowAddNewSupplier(false);
+                                            setShowSupplierSheet(false);
+                                            setSupplierSheetSearch('');
+                                        }
+                                    }}
+                                    placeholder="Neuer Lieferant..."
+                                    className={`flex-1 px-3 py-2.5 rounded-xl border text-sm outline-none ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}`}
+                                    autoFocus
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (newSupplierName.trim()) {
+                                            setSupplierOptions(prev => [...prev, newSupplierName.trim()]);
+                                            setFormData({...formData, supplier: newSupplierName.trim()});
+                                            setNewSupplierName('');
+                                            setShowAddNewSupplier(false);
+                                            setShowSupplierSheet(false);
+                                            setSupplierSheetSearch('');
+                                        }
+                                    }}
+                                    disabled={!newSupplierName.trim()}
+                                    className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold disabled:opacity-50"
+                                >
+                                    <CheckCircle2 size={16} />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>,
+            document.body
+        )}
+
+        {/* ===== FIXED HEADER: Back Arrow + Step Indicator + Close ===== */}
+        <div className={`shrink-0 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+            {/* Navigation row */}
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                {/* Left: Back arrow (visible on step > 1) */}
+                {step > 1 ? (
+                    <button
+                        onClick={() => setStep(prev => prev - 1 as any)}
+                        className={`p-2 -ml-2 rounded-full transition-colors ${isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-600'}`}
+                    >
+                        <ArrowLeft size={22} />
+                    </button>
+                ) : (
+                    <div className="w-10" />
+                )}
+
+                {/* Center: Step indicator dots */}
+                <div className="flex items-center gap-2">
+                    {[1, 2, 3].map(s => (
+                        <React.Fragment key={s}>
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                                step >= s
+                                    ? 'bg-[#0077B5] text-white'
+                                    : isDark ? 'bg-slate-800 text-slate-500' : 'bg-slate-200 text-slate-400'
+                            }`}>
+                                {s}
+                            </div>
+                            {s < 3 && <div className={`w-6 h-0.5 rounded ${step > s ? 'bg-[#0077B5]' : isDark ? 'bg-slate-700' : 'bg-slate-200'}`} />}
+                        </React.Fragment>
+                    ))}
+                </div>
+
+                {/* Right: Close */}
+                <button
+                    onClick={() => onNavigate('dashboard')}
+                    className={`p-2 -mr-2 rounded-full transition-colors ${isDark ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
+                >
+                    <X size={20} />
+                </button>
+            </div>
+
+            {/* Warning banners (sticky in header) */}
+            {formData.poType && (
+                <div className="px-4 pb-2">
+                    {formData.poType === 'normal' && (
+                        <div className={`rounded-lg px-3 py-2 flex gap-2 items-start animate-in fade-in duration-200 ${isDark ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400' : 'bg-amber-50 border border-amber-200 text-amber-800'}`}>
+                            <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                            <p className="text-xs leading-relaxed">
+                                <strong>Lager:</strong> Ware wird direkt dem Bestand hinzugefügt.
+                            </p>
+                        </div>
+                    )}
+                    {formData.poType === 'project' && (
+                        <div className={`rounded-lg px-3 py-2 flex gap-2 items-start animate-in fade-in duration-200 ${isDark ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400' : 'bg-blue-50 border border-blue-200 text-blue-800'}`}>
+                            <Info size={14} className="shrink-0 mt-0.5" />
+                            <p className="text-xs leading-relaxed">
+                                <strong>Projekt:</strong> Ware reserviert — Technik wird benachrichtigt.
+                            </p>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+
+        {/* ===== CONTENT AREA ===== */}
+        <div className="flex-1 overflow-hidden relative">
+
+            {/* ── STEP 1: Compact fields, NO scroll ── */}
+            {step === 1 && (
+                <div className="h-full flex flex-col px-4 pt-2 pb-24 overflow-hidden animate-in fade-in duration-200">
+                    {/* Section header */}
+                    <div className="shrink-0 mb-3 flex items-center justify-between">
+                        <div>
+                            <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                {initialOrder ? 'Bestellung bearbeiten' : 'Kopfdaten'}
+                            </h3>
+                            <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Basisdaten der Bestellung.</p>
+                        </div>
+                        {enableSmartImport && !initialOrder && (
+                            <button
+                                onClick={() => setShowImportModal(true)}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border ${
+                                    isDark
+                                    ? 'text-slate-400 border-slate-700 hover:text-white hover:border-slate-500'
+                                    : 'text-slate-500 border-slate-300 hover:text-slate-800 hover:border-slate-400'
+                                }`}
+                            >
+                                <FileText size={12} /> Import
                             </button>
                         )}
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-xs font-medium opacity-70">Art der Bestellung <span className="text-red-500">*</span></label>
-                            <div className="grid grid-cols-2 gap-4">
-                                <button onClick={() => setFormData({...formData, poType: 'normal'})} className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${formData.poType === 'normal' ? 'bg-[#0077B5] border-[#0077B5] text-white shadow-md shadow-blue-500/20' : isDark ? 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}>
-                                    <Box size={18} /> <span className="font-bold text-sm">Normal (für Lager)</span>
+                    {/* Compact form fields */}
+                    <div className="space-y-3">
+                        {/* PO Type selector */}
+                        <div>
+                            <label className={`text-[11px] font-bold uppercase tracking-wider mb-1.5 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Art <span className="text-red-500">*</span></label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button onClick={() => setFormData({...formData, poType: 'normal'})} className={`flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-bold transition-all active:scale-95 ${formData.poType === 'normal' ? 'bg-[#0077B5] border-[#0077B5] text-white shadow-sm shadow-blue-500/20' : isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
+                                    <Box size={14} /> Lager
                                 </button>
-                                <button onClick={() => setFormData({...formData, poType: 'project'})} className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${formData.poType === 'project' ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20' : isDark ? 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}>
-                                    <Briefcase size={18} /> <span className="font-bold text-sm">Für Projekt</span>
+                                <button onClick={() => setFormData({...formData, poType: 'project'})} className={`flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-bold transition-all active:scale-95 ${formData.poType === 'project' ? 'bg-blue-600 border-blue-600 text-white shadow-sm shadow-blue-500/20' : isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
+                                    <Briefcase size={14} /> Projekt
                                 </button>
                             </div>
                         </div>
 
-                        <div className="space-y-1">
-                            <label className="text-xs font-medium opacity-70">Bestell Nummer <span className="text-red-500">*</span></label>
+                        {/* Order Number */}
+                        <div>
+                            <label className={`text-[11px] font-bold uppercase tracking-wider mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Bestell Nr. <span className="text-red-500">*</span></label>
                             <div className="relative">
-                                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" size={16} />
-                                <input value={formData.orderId} onChange={e => setFormData({...formData, orderId: e.target.value})} className={`${inputClass} pl-10`} placeholder="PO-202X-..." disabled={!!initialOrder} />
+                                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" size={14} />
+                                <input value={formData.orderId} onChange={e => setFormData({...formData, orderId: e.target.value})} className={`${inputClass} pl-9 py-2`} placeholder="PO-202X-..." disabled={!!initialOrder} />
                             </div>
                         </div>
 
-                        <SearchableDropdown
-  value={formData.supplier}
-  onChange={(val) => setFormData({...formData, supplier: val})}
-  options={supplierOptions}
-  onAddNew={(newSup) => setSupplierOptions(prev => [...prev, newSup])}
-  label="Lieferant *"
-  placeholder="Lieferant wählen..."
-  isDark={isDark}
-/>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div className="space-y-1">
-        <label className="text-xs font-medium opacity-70">Bestelldatum <span className="text-red-500">*</span></label>
-        <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none" size={16} />
-            <input 
-                type="date" 
-                value={formData.orderDate} 
-                onChange={e => setFormData({...formData, orderDate: e.target.value})} 
-                className={`${inputClass} pl-10 text-base`} 
-                style={{ colorScheme: isDark ? 'dark' : 'light' }} 
-            />
-        </div>
-    </div>
-    <div className="space-y-1">
-        <label className="text-xs font-medium opacity-70">
-            Geplanter Liefertermin {requireDeliveryDate ? <span className="text-red-500 ml-1">*</span> : <span className="opacity-50 ml-1 font-normal">(Optional)</span>}
-        </label>
-        <div className="relative">
-            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none" size={16} />
-            <input 
-                type="date" 
-                value={formData.expectedDeliveryDate} 
-                onChange={e => setFormData({...formData, expectedDeliveryDate: e.target.value})} 
-                className={`${inputClass} pl-10 text-base`} 
-                required={requireDeliveryDate} 
-                style={{ colorScheme: isDark ? 'dark' : 'light' }} 
-            />
-        </div>
-    </div>
-</div>
+                        {/* Supplier — opens bottom sheet */}
+                        <div>
+                            <label className={`text-[11px] font-bold uppercase tracking-wider mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Lieferant <span className="text-red-500">*</span></label>
+                            <button
+                                type="button"
+                                onClick={() => setShowSupplierSheet(true)}
+                                className={`w-full px-3 py-2 rounded-xl border flex items-center justify-between text-sm transition-all ${
+                                    isDark
+                                        ? 'bg-slate-900 border-slate-700 text-white hover:border-slate-600'
+                                        : 'bg-white border-slate-200 hover:border-slate-300'
+                                }`}
+                            >
+                                <span className={formData.supplier ? '' : 'opacity-40'}>{formData.supplier || 'Lieferant wählen...'}</span>
+                                <ChevronDown size={16} className="opacity-40" />
+                            </button>
+                        </div>
+
+                        {/* Date fields row */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className={`text-[11px] font-bold uppercase tracking-wider mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Datum <span className="text-red-500">*</span></label>
+                                <div className="relative">
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none" size={14} />
+                                    <input
+                                        type="date"
+                                        value={formData.orderDate}
+                                        onChange={e => setFormData({...formData, orderDate: e.target.value})}
+                                        className={`${inputClass} pl-9 py-2`}
+                                        style={{ colorScheme: isDark ? 'dark' : 'light' }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className={`text-[11px] font-bold uppercase tracking-wider mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    Liefertermin {requireDeliveryDate ? <span className="text-red-500">*</span> : <span className="opacity-50 font-normal normal-case">(Opt.)</span>}
+                                </label>
+                                <div className="relative">
+                                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none" size={14} />
+                                    <input
+                                        type="date"
+                                        value={formData.expectedDeliveryDate}
+                                        onChange={e => setFormData({...formData, expectedDeliveryDate: e.target.value})}
+                                        className={`${inputClass} pl-9 py-2`}
+                                        required={requireDeliveryDate}
+                                        style={{ colorScheme: isDark ? 'dark' : 'light' }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
 
-            {/* Step 2: Items */}
+            {/* ── STEP 2: Items — only cards scroll ── */}
             {step === 2 && (
-                <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in slide-in-from-right-4">
-                    <div className="flex justify-between items-end mb-2">
+                <div className="h-full flex flex-col px-4 pt-2 pb-24 animate-in fade-in duration-200">
+                    {/* Header */}
+                    <div className="shrink-0 mb-3 flex justify-between items-end">
                         <div>
-                            <h3 className="text-lg font-bold mb-1">Schritt 2: Artikel hinzufügen</h3>
-                            <p className="text-sm opacity-70">Fügen Sie Artikel zur Bestellung hinzu.</p>
+                            <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Artikel hinzufügen</h3>
+                            <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Positionen zur Bestellung.</p>
                         </div>
-                        <button 
+                        <button
                             onClick={() => setIsCreatingNew(!isCreatingNew)}
-                            className="text-sm text-[#0077B5] font-bold hover:underline flex items-center gap-1"
+                            className="text-xs text-[#0077B5] font-bold hover:underline flex items-center gap-1"
                         >
-                            <Plus size={16} /> {isCreatingNew ? 'Zurück zur Suche' : 'Neuen Artikel anlegen'}
+                            <Plus size={14} /> {isCreatingNew ? 'Suche' : 'Neu'}
                         </button>
                     </div>
 
-                    <div className="space-y-6 relative z-[50]">
+                    {/* Search / Create area (sticky) */}
+                    <div className="shrink-0 mb-3 relative z-[50]">
                         {isCreatingNew ? (
-                            <div className={`p-5 rounded-2xl border space-y-4 animate-in slide-in-from-top-2 ${isDark ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                            <div className={`p-4 rounded-xl border space-y-3 animate-in slide-in-from-top-2 duration-200 ${isDark ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
                                 <input value={newItemData.name} onChange={e => setNewItemData({...newItemData, name: e.target.value})} placeholder="Artikelbezeichnung" className={inputClass} autoFocus />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <input value={newItemData.sku} onChange={e => setNewItemData({...newItemData, sku: e.target.value})} placeholder="Artikelnummer / SKU" className={inputClass} />
-                                    <div className="relative group" ref={systemInputRef}>
-                                        <input value={newItemData.system} onChange={e => { setNewItemData({...newItemData, system: e.target.value}); updateSystemDropdownPosition(); }} onFocus={updateSystemDropdownPosition} placeholder="System (z.B. BMA)" className={`${inputClass} pr-8`} />
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none" size={16} />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <input value={newItemData.sku} onChange={e => setNewItemData({...newItemData, sku: e.target.value})} placeholder="SKU" className={inputClass} />
+                                    <div className="relative" ref={systemInputRef}>
+                                        <input value={newItemData.system} onChange={e => { setNewItemData({...newItemData, system: e.target.value}); updateSystemDropdownPosition(); }} onFocus={updateSystemDropdownPosition} placeholder="System" className={`${inputClass} pr-8`} />
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none" size={14} />
                                         {showSystemDropdown && filteredSystems.length > 0 && createPortal(
                                             <div ref={systemDropdownRef} style={{ position: 'absolute', top: systemDropdownCoords.top + 4, left: systemDropdownCoords.left, width: systemDropdownCoords.width, zIndex: 9999 }} className={`max-h-40 overflow-y-auto rounded-xl border shadow-xl animate-in fade-in zoom-in-95 duration-100 ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
-                                                {filteredSystems.map(sys => (<button key={sys} onClick={() => { setNewItemData({...newItemData, system: sys}); setShowSystemDropdown(false); }} className={`w-full text-left px-4 py-2.5 text-sm transition-all flex items-center justify-between group/item ${isDark ? 'hover:bg-slate-800 text-slate-200 border-b border-slate-800 last:border-0' : 'hover:bg-slate-50 text-slate-700 border-b border-slate-50 last:border-0'}`}><span>{sys}</span></button>))}
+                                                {filteredSystems.map(sys => (<button key={sys} onClick={() => { setNewItemData({...newItemData, system: sys}); setShowSystemDropdown(false); }} className={`w-full text-left px-4 py-2.5 text-sm transition-all ${isDark ? 'hover:bg-slate-800 text-slate-200' : 'hover:bg-slate-50 text-slate-700'}`}><span>{sys}</span></button>))}
                                             </div>, document.body
                                         )}
                                     </div>
                                 </div>
-                                <button onClick={handleCreateNewItem} disabled={!newItemData.name || !newItemData.sku} className="w-full py-3 bg-[#0077B5] text-white rounded-xl font-bold text-sm hover:bg-[#00A0DC] disabled:opacity-50 transition-colors shadow-lg shadow-blue-500/20">Artikel erstellen & hinzufügen</button>
+                                <button onClick={handleCreateNewItem} disabled={!newItemData.name || !newItemData.sku} className="w-full py-2.5 bg-[#0077B5] text-white rounded-xl font-bold text-sm hover:bg-[#00A0DC] disabled:opacity-50 transition-colors">Erstellen & hinzufügen</button>
                             </div>
                         ) : (
-                            <div className="relative group">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <input ref={searchInputRef} value={searchTerm} onChange={e => handleSearchChange(e.target.value)} onFocus={() => { if(searchTerm) updateSearchDropdownPosition(); }} placeholder="Artikel suchen..." className={`${inputClass} pl-10 pr-3 py-3`} autoFocus />
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                <input ref={searchInputRef} value={searchTerm} onChange={e => handleSearchChange(e.target.value)} onFocus={() => { if(searchTerm) updateSearchDropdownPosition(); }} placeholder="Artikel suchen..." className={`${inputClass} pl-10 py-2.5`} autoFocus />
                                 {showSearchDropdown && searchResults.length > 0 && createPortal(
-                                    <div ref={searchDropdownRef} style={{ position: 'absolute', top: searchDropdownCoords.top + 8, left: searchDropdownCoords.left, width: searchDropdownCoords.width, zIndex: 9999, maxHeight: '400px' }} className={`rounded-xl border shadow-2xl overflow-y-auto animate-in fade-in zoom-in-95 duration-100 ${isDark ? 'bg-[#1e293b] border-slate-600' : 'bg-white border-slate-300'}`}>
-                                        {searchResults.map(item => (<button key={item.id} onClick={() => addToCart(item)} className={`w-full text-left p-4 flex justify-between items-center border-b last:border-0 transition-colors ${isDark ? 'border-slate-700 hover:bg-slate-700 text-slate-200' : 'border-slate-100 hover:bg-slate-50 text-slate-800'}`}><div><div className="font-bold text-base">{item.name}</div><div className="text-sm opacity-70 mt-0.5 flex items-center gap-2"><span>#{item.sku}</span><span className="opacity-50">â€¢</span><span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'}`}>{item.system}</span></div></div><div className="bg-[#0077B5]/10 p-2 rounded-full"><Plus size={20} className="text-[#0077B5]" /></div></button>))}
+                                    <div ref={searchDropdownRef} style={{ position: 'absolute', top: searchDropdownCoords.top + 8, left: searchDropdownCoords.left, width: searchDropdownCoords.width, zIndex: 9999, maxHeight: '300px' }} className={`rounded-xl border shadow-2xl overflow-y-auto animate-in fade-in zoom-in-95 duration-100 ${isDark ? 'bg-[#1e293b] border-slate-600' : 'bg-white border-slate-300'}`}>
+                                        {searchResults.map(item => (
+                                            <button key={item.id} onClick={() => addToCart(item)} className={`w-full text-left p-3 flex justify-between items-center border-b last:border-0 transition-colors ${isDark ? 'border-slate-700 hover:bg-slate-700 text-slate-200' : 'border-slate-100 hover:bg-slate-50 text-slate-800'}`}>
+                                                <div>
+                                                    <div className="font-bold text-sm">{item.name}</div>
+                                                    <div className="text-xs opacity-60 mt-0.5">#{item.sku} · {item.system}</div>
+                                                </div>
+                                                <div className="bg-[#0077B5]/10 p-1.5 rounded-full"><Plus size={16} className="text-[#0077B5]" /></div>
+                                            </button>
+                                        ))}
                                     </div>, document.body
                                 )}
                             </div>
                         )}
                     </div>
 
-                    <div className="space-y-3 relative z-0">
-                        <h4 className="text-sm font-bold opacity-70 uppercase tracking-wider mb-2">Positionen ({cart.filter(c => !c.isDeleted).length})</h4>
+                    {/* Scrollable product cards */}
+                    <div className="flex-1 overflow-y-auto -mx-4 px-4 pb-2 relative z-0">
+                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 sticky top-0 py-1 ${isDark ? 'text-slate-500 bg-slate-900' : 'text-slate-400 bg-white'}`}>
+                            Positionen ({cart.filter(c => !c.isDeleted).length})
+                        </h4>
                         {cart.length === 0 ? (
-                            <div className="p-8 border rounded-xl border-dashed text-center text-slate-500">Keine Artikel ausgewählt.</div>
+                            <div className={`p-6 border rounded-xl border-dashed text-center text-sm ${isDark ? 'text-slate-500 border-slate-700' : 'text-slate-400 border-slate-300'}`}>Keine Artikel ausgewählt.</div>
                         ) : (
-                            <div className="rounded-xl border overflow-hidden shadow-sm">
-                                <table className={`w-full text-sm text-left ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
-                                    <thead className={`text-xs uppercase font-bold ${isDark ? 'bg-slate-950 text-slate-400' : 'bg-slate-50 text-slate-500'}`}>
-                                        <tr>
-                                            <th className="px-4 py-3">Artikel</th>
-                                            <th className="px-4 py-3 w-32 text-center">Menge</th>
-                                            <th className="px-4 py-3 w-16 text-center"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className={`divide-y ${isDark ? 'divide-slate-800' : 'divide-slate-100'}`}>
-                                        {cart.map((line, idx) => {
-                                            const isDeleted = line.isDeleted;
-                                            const isAdded = line.isAddedLater && !line.isDeleted;
-                                            
-                                            return (
-                                            <tr key={idx} className={`group ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'} ${isDeleted ? 'opacity-60 bg-red-500/5' : ''} ${isAdded ? 'bg-blue-500/5' : ''}`}>
-                                                <td className="px-4 py-3">
-                                                    <div className={`font-bold flex items-center gap-2 ${isDark ? 'text-slate-100' : 'text-slate-900'} ${isDeleted ? 'line-through text-slate-500' : ''}`}>
-                                                        {line.name}
-                                                        {isAdded && <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-500 text-white font-bold uppercase tracking-wider">NEU</span>}
-                                                        {isDeleted && <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-500/10 text-red-500 font-bold uppercase tracking-wider border border-red-500/20">STORNIERT</span>}
-                                                    </div>
-                                                    <div className={`text-xs mt-0.5 flex items-center gap-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                                        <span className="font-mono">#{line.sku}</span>
-                                                        <span className="opacity-50">â€¢</span>
-                                                        <span className="uppercase tracking-wider text-[10px] font-bold opacity-80">{line.system}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3">
-    <div className="flex justify-center">
-        <PlusMinusPicker
-            value={line.quantity}
-            onChange={(val) => updateCartQty(idx, val)}
-            min={1}
-            max={9999}
-            disabled={isDeleted}
-            isDark={isDark}
-        />
-    </div>
-</td>
-                                                <td className="px-4 py-3 text-center">
-                                                    {isDeleted ? (
-                                                        <button 
-                                                            onClick={() => reactivateCartItem(idx)} 
-                                                            className="p-1.5 text-slate-400 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-colors"
-                                                            title="Wiederherstellen"
-                                                        >
-                                                            <Undo2 size={16} />
-                                                        </button>
-                                                    ) : (
-                                                        <button 
-                                                            onClick={() => removeCartItem(idx)} 
-                                                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                                                            title="Löschen"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        )})}
-                                    </tbody>
-                                </table>
+                            <div className="space-y-2">
+                                {cart.map((line, idx) => {
+                                    const isDeleted = line.isDeleted;
+                                    const isAdded = line.isAddedLater && !line.isDeleted;
+                                    return (
+                                        <div key={idx} className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
+                                            isDark ? 'bg-slate-800/30 border-slate-700' : 'bg-slate-50 border-slate-200'
+                                        } ${isDeleted ? 'opacity-50' : ''} ${isAdded ? 'border-blue-500/20' : ''}`}>
+                                            <div className="flex-1 min-w-0">
+                                                <div className={`font-bold text-sm truncate flex items-center gap-1.5 ${isDeleted ? 'line-through text-slate-500' : isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+                                                    {line.name}
+                                                    {isAdded && <span className="px-1 py-0.5 rounded text-[9px] bg-blue-500 text-white font-bold shrink-0">NEU</span>}
+                                                    {isDeleted && <span className="px-1 py-0.5 rounded text-[9px] bg-red-500/20 text-red-500 font-bold shrink-0">STORNO</span>}
+                                                </div>
+                                                <div className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>#{line.sku} · {line.system}</div>
+                                            </div>
+                                            <PlusMinusPicker
+                                                value={line.quantity}
+                                                onChange={(val) => updateCartQty(idx, val)}
+                                                min={1} max={9999}
+                                                disabled={isDeleted}
+                                                isDark={isDark}
+                                            />
+                                            {isDeleted ? (
+                                                <button onClick={() => reactivateCartItem(idx)} className="p-1.5 text-slate-400 hover:text-emerald-500 rounded-lg transition-colors" title="Wiederherstellen"><Undo2 size={16} /></button>
+                                            ) : (
+                                                <button onClick={() => removeCartItem(idx)} className="p-1.5 text-slate-400 hover:text-red-500 rounded-lg transition-colors" title="Löschen"><Trash2 size={16} /></button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
                 </div>
             )}
 
-            {/* Step 3: Summary */}
+            {/* ── STEP 3: Summary — only cards scroll ── */}
             {step === 3 && (
-                <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in slide-in-from-right-4">
-                    <div className="mb-4">
-                        <h3 className="text-lg font-bold mb-1">Schritt 3: Abschluss</h3>
-                        <p className="text-sm opacity-70">Überprüfen Sie die Bestellung vor dem Speichern.</p>
+                <div className="h-full flex flex-col px-4 pt-2 pb-24 animate-in fade-in duration-200">
+                    {/* Header */}
+                    <div className="shrink-0 mb-3">
+                        <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Zusammenfassung</h3>
+                        <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Überprüfen Sie die Bestellung.</p>
                     </div>
 
-                    <div className={`p-5 rounded-2xl border mb-6 ${isDark ? 'bg-[#1f2937] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div><div className={`text-xs uppercase font-bold tracking-wider mb-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Bestell Nr.</div><div className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>{formData.orderId}</div></div>
-                            <div><div className={`text-xs uppercase font-bold tracking-wider mb-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Datum</div><div className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{formatDate(formData.orderDate)}</div></div>
-                            <div><div className={`text-xs uppercase font-bold tracking-wider mb-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Art der Bestellung</div><div className={`font-bold flex items-center gap-1.5 ${formData.poType === 'project' ? 'text-blue-500' : (isDark ? 'text-white' : 'text-gray-900')}`}>{formData.poType === 'project' ? <Briefcase size={14} /> : <Box size={14}/>}{formData.poType === 'project' ? 'Projekt' : 'Normal (Lager)'}</div></div>
-                            <div><div className={`text-xs uppercase font-bold tracking-wider mb-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Lieferant</div><div className={`font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}><Truck size={14}/> {formData.supplier}</div></div>
-                            {formData.expectedDeliveryDate && (<div className="col-span-2 pt-2 border-t border-slate-500/10 mt-1"><div className={`text-xs uppercase font-bold tracking-wider mb-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Geplanter Liefertermin</div><div className={`font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}><Clock size={14} className="text-[#0077B5]"/> {formatDate(formData.expectedDeliveryDate)}</div></div>)}
+                    {/* Summary card (sticky) */}
+                    <div className={`shrink-0 p-4 rounded-xl border mb-3 ${isDark ? 'bg-[#1f2937] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <div className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Bestell Nr.</div>
+                                <div className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{formData.orderId}</div>
+                            </div>
+                            <div>
+                                <div className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Datum</div>
+                                <div className={`font-bold text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{formatDate(formData.orderDate)}</div>
+                            </div>
+                            <div>
+                                <div className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Typ</div>
+                                <div className={`font-bold text-sm flex items-center gap-1 ${formData.poType === 'project' ? 'text-blue-500' : (isDark ? 'text-white' : 'text-gray-900')}`}>
+                                    {formData.poType === 'project' ? <Briefcase size={12} /> : <Box size={12}/>}
+                                    {formData.poType === 'project' ? 'Projekt' : 'Lager'}
+                                </div>
+                            </div>
+                            <div>
+                                <div className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Lieferant</div>
+                                <div className={`font-bold text-sm flex items-center gap-1 ${isDark ? 'text-white' : 'text-gray-900'}`}><Truck size={12}/> {formData.supplier}</div>
+                            </div>
+                            {formData.expectedDeliveryDate && (
+                                <div className="col-span-2 pt-2 border-t border-slate-500/10">
+                                    <div className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Liefertermin</div>
+                                    <div className={`font-bold text-sm flex items-center gap-1 ${isDark ? 'text-white' : 'text-gray-900'}`}><Clock size={12} className="text-[#0077B5]"/> {formatDate(formData.expectedDeliveryDate)}</div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <h4 className="text-sm font-bold opacity-70 uppercase tracking-wider">Positionen ({cart.length})</h4>
-                        {cart.map((line, idx) => (
-                            <div key={idx} className={`p-4 rounded-xl border flex gap-4 items-center ${isDark ? 'bg-slate-800/30 border-slate-700' : 'bg-white border-slate-200 shadow-sm'} ${line.isDeleted ? 'opacity-60 bg-red-500/5 border-red-500/20' : ''}`}>
-                                <div className="flex-1 min-w-0">
-                                    <div className={`font-bold text-sm truncate flex items-center gap-2 ${isDark ? 'text-slate-100' : 'text-slate-900'} ${line.isDeleted ? 'line-through text-slate-500' : ''}`}>
-                                        {line.name}
-                                        {line.isAddedLater && !line.isDeleted && <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-500 text-white font-bold uppercase tracking-wider">NEU</span>}
-                                        {line.isDeleted && <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-500 text-white font-bold uppercase tracking-wider">STORNIERT</span>}
+                    {/* Scrollable position cards */}
+                    <div className="flex-1 overflow-y-auto -mx-4 px-4 pb-2">
+                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 sticky top-0 py-1 ${isDark ? 'text-slate-500 bg-slate-900' : 'text-slate-400 bg-white'}`}>
+                            Positionen ({cart.filter(c => !c.isDeleted).length})
+                        </h4>
+                        <div className="space-y-2">
+                            {cart.map((line, idx) => (
+                                <div key={idx} className={`p-3 rounded-xl border flex items-center gap-3 ${
+                                    isDark ? 'bg-slate-800/30 border-slate-700' : 'bg-white border-slate-200'
+                                } ${line.isDeleted ? 'opacity-50' : ''}`}>
+                                    <div className="flex-1 min-w-0">
+                                        <div className={`font-bold text-sm truncate flex items-center gap-1.5 ${isDark ? 'text-slate-100' : 'text-slate-900'} ${line.isDeleted ? 'line-through text-slate-500' : ''}`}>
+                                            {line.name}
+                                            {line.isAddedLater && !line.isDeleted && <span className="px-1 py-0.5 rounded text-[9px] bg-blue-500 text-white font-bold shrink-0">NEU</span>}
+                                            {line.isDeleted && <span className="px-1 py-0.5 rounded text-[9px] bg-red-500 text-white font-bold shrink-0">STORNO</span>}
+                                        </div>
+                                        <div className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>#{line.sku} · {line.system}</div>
                                     </div>
-                                    <div className={`text-xs mt-0.5 flex items-center gap-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                        <span className="font-mono">#{line.sku}</span>
-                                        <span className="opacity-50">â€¢</span>
-                                        <span className="uppercase tracking-wider text-[10px] font-bold opacity-80">{line.system}</span>
+                                    <div className="text-right shrink-0">
+                                        <span className={`text-[10px] uppercase font-bold block ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Menge</span>
+                                        <span className={`text-lg font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'} ${line.isDeleted ? 'line-through opacity-50' : ''}`}>
+                                            {line.quantity}
+                                        </span>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <span className="text-xs opacity-60 uppercase font-bold block">Menge</span>
-                                    <span className={`text-lg font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'} ${line.isDeleted ? 'line-through opacity-50' : ''}`}>
-                                        {line.quantity}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
         </div>
 
-        {/* Footer */}
-        <div className={`fixed bottom-4 left-0 right-0 z-[1000] px-3 sm:px-5 py-3 border-t shadow-lg flex justify-between items-center ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-            {step > 1 ? (
-                <button onClick={() => setStep(prev => prev - 1 as any)} className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-200'}`}>
-                    <ArrowLeft size={20} /> Zurück
-                </button>
-            ) : <div/>}
-
+        {/* ===== FIXED BOTTOM-RIGHT BUTTON (always visible) ===== */}
+        <div className="fixed bottom-6 right-6 z-[1000]">
             {step < 3 ? (
-                <button 
+                <button
                     onClick={() => setStep(prev => prev + 1 as any)}
                     disabled={!canGoNext()}
-                    className="px-8 py-3 bg-[#0077B5] hover:bg-[#00A0DC] text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 disabled:opacity-50 flex items-center gap-2 transition-all"
+                    className="px-6 py-3 bg-[#0077B5] hover:bg-[#00A0DC] text-white rounded-2xl font-bold shadow-xl shadow-blue-500/25 disabled:opacity-40 disabled:shadow-none flex items-center gap-2 transition-all active:scale-95 text-sm"
                 >
-                    Weiter <ArrowRight size={20} />
+                    Weiter <ArrowRight size={18} />
                 </button>
             ) : (
-                <button 
+                <button
                     onClick={handleSubmit}
                     disabled={submissionStatus === 'submitting'}
-                    className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center gap-2 transition-all"
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-bold shadow-xl shadow-emerald-500/25 disabled:opacity-40 flex items-center gap-2 transition-all active:scale-95 text-sm"
                 >
-                    {submissionStatus === 'submitting' ? <Loader2 size={20} className="animate-spin" /> : <CheckCircle2 size={20} />} 
-                    Bestellung speichern
+                    {submissionStatus === 'submitting' ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
+                    Speichern
                 </button>
             )}
         </div>
