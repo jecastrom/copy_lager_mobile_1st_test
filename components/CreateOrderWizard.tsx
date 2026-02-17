@@ -216,7 +216,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className={`h-[100dvh] md:h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+    <div className={`h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ touchAction: 'pan-y', overscrollBehavior: 'contain' }}>
 
       {/* ── SUCCESS / ERROR OVERLAY ── */}
       {(submissionStatus === 'success' || submissionStatus === 'error') && createPortal(
@@ -424,8 +424,8 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           SCROLLABLE CONTENT — only this region scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className="flex-1 min-h-0 overflow-hidden md:overflow-y-auto">
-          <div className={`max-w-xl mx-auto ${step !== 1 ? 'h-full flex flex-col md:block md:h-auto' : ''}`}>
+      <div className={`flex-1 min-h-0 ${step === 1 ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+          <div className={`max-w-xl mx-auto ${step !== 1 ? 'h-full flex flex-col' : ''}`}>
 
             {/* ── STEP 1: Fixed, no scroll ── */}
             {step === 1 && (
@@ -488,10 +488,11 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
             {/* ── STEP 2: Only list scrolls ── */}
             {step === 2 && (
-              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 overflow-y-auto md:flex-none md:min-h-0">
-                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col">
+                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
+                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
                 {cart.length === 0 ? (
                   <div className={`p-6 border rounded-xl border-dashed text-center text-sm ${isDark ? 'text-slate-500 border-slate-700' : 'text-slate-400 border-slate-300'}`}>Keine Artikel ausgewählt.</div>
                 ) : (
@@ -520,13 +521,14 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
                     })}
                   </div>
                 )}
+                </div>
               </div>
             )}
 
             {/* ── STEP 3: Only list scrolls ── */}
             {step === 3 && (
-              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 overflow-y-auto md:flex-none md:min-h-0">
-                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col">
+                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
                 <div className="space-y-2">
