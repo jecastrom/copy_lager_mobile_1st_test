@@ -531,6 +531,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
                 <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
+                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
                 <div className="space-y-2">
                   {cart.map((line, idx) => {
                     const isDel = line.isDeleted;
@@ -552,6 +553,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
                       </div>
                     );
                   })}
+                </div>
                 </div>
               </div>
             )}
