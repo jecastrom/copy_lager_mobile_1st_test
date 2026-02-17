@@ -119,7 +119,6 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
   const [showAddNewSupplier, setShowAddNewSupplier] = useState(false);
   const [newSupplierName, setNewSupplierName] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
-  const wizardRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchDropdownRef = useRef<HTMLDivElement>(null);
   const [searchDropdownCoords, setSearchDropdownCoords] = useState({ top: 0, left: 0, width: 0 });
@@ -129,18 +128,55 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
   const [systemDropdownCoords, setSystemDropdownCoords] = useState({ top: 0, left: 0, width: 0 });
 
   useEffect(() => {
-    const el = wizardRef.current;
-    if (!el) return;
+    const origBody = document.body.style.overflow;
+    const origHtml = document.documentElement.style.overflow;
+    const origBodyPos = document.body.style.position;
+    const origBodyWidth = document.body.style.width;
+    const origScrollY = window.scrollY;
+
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.top = `-${origScrollY}px`;
+    document.documentElement.style.overflow = 'hidden';
+
     const handler = (e: TouchEvent) => {
       let target = e.target as HTMLElement | null;
-      while (target && target !== el) {
-        if (target.getAttribute('data-scrollable') === 'true') return;
+      while (target) {
+        if (target.getAttribute('data-scrollable') === 'true') {
+          const scrollEl = target;
+          const atTop = scrollEl.scrollTop <= 0;
+          const atBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 1;
+          const isScrollingUp = e.touches[0]?.clientY > (handler as any)._lastY;
+          const isScrollingDown = e.touches[0]?.clientY < (handler as any)._lastY;
+          if ((atTop && isScrollingUp) || (atBottom && isScrollingDown)) {
+            e.preventDefault();
+            return;
+          }
+          return;
+        }
         target = target.parentElement;
       }
       e.preventDefault();
     };
-    el.addEventListener('touchmove', handler, { passive: false });
-    return () => el.removeEventListener('touchmove', handler);
+
+    const trackTouch = (e: TouchEvent) => {
+      (handler as any)._lastY = e.touches[0]?.clientY || 0;
+    };
+
+    document.addEventListener('touchstart', trackTouch, { passive: true });
+    document.addEventListener('touchmove', handler, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchstart', trackTouch);
+      document.removeEventListener('touchmove', handler);
+      document.body.style.overflow = origBody;
+      document.body.style.position = origBodyPos;
+      document.body.style.width = origBodyWidth;
+      document.body.style.top = '';
+      document.documentElement.style.overflow = origHtml;
+      window.scrollTo(0, origScrollY);
+    };
   }, []);
 
   useEffect(() => {
