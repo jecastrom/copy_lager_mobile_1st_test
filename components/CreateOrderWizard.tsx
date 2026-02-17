@@ -216,7 +216,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className={`h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+    <div className={`h-[100dvh] md:h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
 
       {/* ── SUCCESS / ERROR OVERLAY ── */}
       {(submissionStatus === 'success' || submissionStatus === 'error') && createPortal(
@@ -424,7 +424,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           SCROLLABLE CONTENT — only this region scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className={`flex-1 min-h-0 ${step === 1 ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           <div className="max-w-xl mx-auto">
 
             {/* ── STEP 1: Fixed, no scroll ── */}
@@ -554,16 +554,16 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
               </div>
             )}
 
-            {(step === 2 || step === 3) && <div className="h-4" />}
+            {(step === 2 || step === 3) && <div className="h-6" />}
           </div>
       </div>
 
       {/* ══════════════════════════════════════════════════════
           FIXED BOTTOM BUTTON — always visible, never occluded
           ══════════════════════════════════════════════════════ */}
-      <div className={`shrink-0 z-30 ${isDark ? 'bg-slate-900' : 'bg-white'}`}
-        style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom, 0px))' }}>
-        <div className="max-w-xl mx-auto px-4 pt-1.5">
+      <div className={`shrink-0 z-30 border-t ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
+        <div className="max-w-xl mx-auto px-4 pt-2.5">
           {step < 3 ? (
             <button onClick={() => setStep(p => (p + 1) as any)} disabled={!canGoNext()}
               className={`w-full md:w-auto px-6 py-[9px] rounded-lg font-semibold inline-flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] text-[13px] text-white ${canGoNext() ? 'bg-[#0077B5] hover:bg-[#005f8f] shadow-sm shadow-blue-500/15' : 'bg-slate-300 dark:bg-slate-700 shadow-none cursor-not-allowed'}`}>
