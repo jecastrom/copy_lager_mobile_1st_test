@@ -268,7 +268,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
   // ═══════════════════════════════════════════════════════════
   return (
-    <div ref={wizardRef} className={`h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ overscrollBehavior: 'none', position: 'relative' }}>
+    <div className={`h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ overscrollBehavior: 'none' }}>
 
       {/* ── SUCCESS / ERROR OVERLAY ── */}
       {(submissionStatus === 'success' || submissionStatus === 'error') && createPortal(
