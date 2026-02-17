@@ -470,15 +470,15 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
                     <div>
                       <label className={`text-[11px] font-bold uppercase tracking-wider mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Datum <span className="text-red-500">*</span></label>
                       <div className="relative">
-                        <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 opacity-40" size={12} />
-                        <input type="date" value={formData.orderDate} onChange={e => setFormData({ ...formData, orderDate: e.target.value })} className={`${inputCls} pl-7 py-1.5 text-xs`} style={{ colorScheme: isDark ? 'dark' : 'light' }} />
+                        <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 opacity-40" size={11} />
+                        <input type="date" value={formData.orderDate} onChange={e => setFormData({ ...formData, orderDate: e.target.value })} className={`${inputCls} pl-6 py-1 text-[11px] h-8 min-h-0`} style={{ colorScheme: isDark ? 'dark' : 'light' }} />
                       </div>
                     </div>
                     <div>
                       <label className={`text-[11px] font-bold uppercase tracking-wider mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Liefertermin {requireDeliveryDate && <span className="text-red-500">*</span>}</label>
                       <div className="relative">
-                        <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 opacity-40" size={12} />
-                        <input type="date" value={formData.expectedDeliveryDate} onChange={e => setFormData({ ...formData, expectedDeliveryDate: e.target.value })} className={`${inputCls} pl-7 py-1.5 text-xs`} style={{ colorScheme: isDark ? 'dark' : 'light' }} />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 opacity-40" size={11} />
+                        <input type="date" value={formData.expectedDeliveryDate} onChange={e => setFormData({ ...formData, expectedDeliveryDate: e.target.value })} className={`${inputCls} pl-6 py-1 text-[11px] h-8 min-h-0`} style={{ colorScheme: isDark ? 'dark' : 'light' }} />
                       </div>
                     </div>
                   </div>
