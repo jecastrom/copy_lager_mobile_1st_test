@@ -466,19 +466,19 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
                     </button>
                   </div>
                   {/* Date row */}
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-1.5">
                     <div>
-                      <label className={`text-[11px] font-bold uppercase tracking-wider mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Datum <span className="text-red-500">*</span></label>
+                      <label className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Datum <span className="text-red-500">*</span></label>
                       <div className="relative">
-                        <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 opacity-40" size={11} />
-                        <input type="date" value={formData.orderDate} onChange={e => setFormData({ ...formData, orderDate: e.target.value })} className={`${inputCls} pl-6 py-1 text-[11px] h-8 min-h-0`} style={{ colorScheme: isDark ? 'dark' : 'light' }} />
+                        <Calendar className="absolute left-1.5 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none z-10" size={10} />
+                        <input type="date" value={formData.orderDate} onChange={e => setFormData({ ...formData, orderDate: e.target.value })} className={`${inputCls} pl-5 pr-1 py-0.5 text-[11px] w-full`} style={{ colorScheme: isDark ? 'dark' : 'light', fontSize: '11px', height: '30px', minHeight: '0', WebkitAppearance: 'none', lineHeight: '1' }} />
                       </div>
                     </div>
                     <div>
-                      <label className={`text-[11px] font-bold uppercase tracking-wider mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Liefertermin {requireDeliveryDate && <span className="text-red-500">*</span>}</label>
+                      <label className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Liefertermin {requireDeliveryDate && <span className="text-red-500">*</span>}</label>
                       <div className="relative">
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 opacity-40" size={11} />
-                        <input type="date" value={formData.expectedDeliveryDate} onChange={e => setFormData({ ...formData, expectedDeliveryDate: e.target.value })} className={`${inputCls} pl-6 py-1 text-[11px] h-8 min-h-0`} style={{ colorScheme: isDark ? 'dark' : 'light' }} />
+                        <Clock className="absolute left-1.5 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none z-10" size={10} />
+                        <input type="date" value={formData.expectedDeliveryDate} onChange={e => setFormData({ ...formData, expectedDeliveryDate: e.target.value })} className={`${inputCls} pl-5 pr-1 py-0.5 text-[11px] w-full`} style={{ colorScheme: isDark ? 'dark' : 'light', fontSize: '11px', height: '30px', minHeight: '0', WebkitAppearance: 'none', lineHeight: '1' }} />
                       </div>
                     </div>
                   </div>
