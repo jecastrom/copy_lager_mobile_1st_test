@@ -424,8 +424,8 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           SCROLLABLE CONTENT — only this region scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className={`flex-1 min-h-0 ${step === 1 ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-          <div className="max-w-xl mx-auto">
+      <div className="flex-1 min-h-0 overflow-hidden md:overflow-y-auto">
+          <div className={`max-w-xl mx-auto ${step !== 1 ? 'h-full flex flex-col md:block md:h-auto' : ''}`}>
 
             {/* ── STEP 1: Fixed, no scroll ── */}
             {step === 1 && (
@@ -488,7 +488,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
             {/* ── STEP 2: Only list scrolls ── */}
             {step === 2 && (
-              <div className="px-4 pt-3 pb-4">
+              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 overflow-y-auto md:flex-none md:min-h-0">
                 <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
@@ -525,7 +525,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
             {/* ── STEP 3: Only list scrolls ── */}
             {step === 3 && (
-              <div className="px-4 pt-3 pb-4">
+              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 overflow-y-auto md:flex-none md:min-h-0">
                 <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
@@ -554,7 +554,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
               </div>
             )}
 
-            {(step === 2 || step === 3) && <div className="h-20 md:h-6" />}
+            {(step === 2 || step === 3) && <div className="hidden md:block h-6" />}
           </div>
       </div>
 
