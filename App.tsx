@@ -61,7 +61,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
               Etwas ist schiefgelaufen
             </h1>
             <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Die Anwendung ist auf einen unerwarteten Fehler gestoÃŸen. Bitte laden Sie die Seite neu.
+              Die Anwendung ist auf einen unerwarteten Fehler gestoßen. Bitte laden Sie die Seite neu.
             </p>
             {this.state.error && (
               <details className="mb-6 text-left">
@@ -404,7 +404,7 @@ export default function App() {
       bestellNr: po.id,
       lieferdatum: new Date().toISOString().split('T')[0],
       lieferant: po.supplier,
-      status: 'In PrÃ¼fung',
+      status: 'In Prüfung',
       timestamp,
       itemCount: 0,
       warehouseLocation: 'Wareneingang',
@@ -750,7 +750,7 @@ export default function App() {
         const returnItems = cartItems.filter(c => c.quantityRejected > 0);
         
         const returnMsg = returnItems.map(c => 
-            `RÃ¼cksendung: ${c.quantityRejected}x ${c.item.name} (${c.rejectionReason || 'Sonstiges'}). ` +
+            `Rücksendung: ${c.quantityRejected}x ${c.item.name} (${c.rejectionReason || 'Sonstiges'}). ` +
             (c.returnCarrier ? `Via ${c.returnCarrier} ${c.returnTrackingId ? `(${c.returnTrackingId})` : ''}` : '')
         ).join('\n');
 
