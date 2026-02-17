@@ -424,7 +424,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           SCROLLABLE CONTENT — only this region scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className={`flex-1 min-h-0 ${step === 1 ? 'overflow-hidden' : 'overflow-hidden'}`} style={{ touchAction: step === 1 ? 'none' : 'auto' }}>
+      <div className={`flex-1 min-h-0 overflow-hidden`} style={{ touchAction: step === 1 ? 'none' : 'pan-y' }}>
           <div className={`max-w-xl mx-auto ${step !== 1 ? 'h-full flex flex-col' : ''}`}>
 
             {/* ── STEP 1: Fixed, no scroll ── */}
@@ -489,7 +489,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
             {/* ── STEP 2: Only list scrolls ── */}
             {step === 2 && (
               <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col">
-                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`} style={{ touchAction: 'none' }}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
                 <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
@@ -527,8 +527,8 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
             {/* ── STEP 3: Only list scrolls ── */}
             {step === 3 && (
-              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col" style={{ touchAction: 'none' }}>
-                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col">
+                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`} style={{ touchAction: 'none' }}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
                 <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
