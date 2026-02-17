@@ -119,6 +119,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
   const [showAddNewSupplier, setShowAddNewSupplier] = useState(false);
   const [newSupplierName, setNewSupplierName] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const wizardRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchDropdownRef = useRef<HTMLDivElement>(null);
   const [searchDropdownCoords, setSearchDropdownCoords] = useState({ top: 0, left: 0, width: 0 });
@@ -126,6 +127,21 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
   const systemInputRef = useRef<HTMLDivElement>(null);
   const systemDropdownRef = useRef<HTMLDivElement>(null);
   const [systemDropdownCoords, setSystemDropdownCoords] = useState({ top: 0, left: 0, width: 0 });
+
+  useEffect(() => {
+    const el = wizardRef.current;
+    if (!el) return;
+    const handler = (e: TouchEvent) => {
+      let target = e.target as HTMLElement | null;
+      while (target && target !== el) {
+        if (target.getAttribute('data-scrollable') === 'true') return;
+        target = target.parentElement;
+      }
+      e.preventDefault();
+    };
+    el.addEventListener('touchmove', handler, { passive: false });
+    return () => el.removeEventListener('touchmove', handler);
+  }, []);
 
   useEffect(() => {
     if (initialOrder) {
@@ -216,7 +232,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className={`h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ touchAction: 'none', overscrollBehavior: 'none', position: 'relative' }}>
+    <div ref={wizardRef} className={`h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ overscrollBehavior: 'none', position: 'relative' }}>
 
       {/* ── SUCCESS / ERROR OVERLAY ── */}
       {(submissionStatus === 'success' || submissionStatus === 'error') && createPortal(
@@ -296,7 +312,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           FIXED HEADER — pinned top, never scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className={`shrink-0 z-20 ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ touchAction: 'none' }}>
+      <div className={`shrink-0 z-20 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
         <div className="max-w-xl mx-auto">
           {/* Nav: Back | Steps | Close */}
           <div className="flex items-center justify-between px-4 pt-3 pb-2">
@@ -332,7 +348,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
           {/* ── Step 2/3 sticky sub-header (title + search) ── */}
           {step === 2 && (
-            <div className="px-4 pb-3" style={{ touchAction: 'none' }}>
+            <div className="px-4 pb-3">
               <div className="flex justify-between items-end mb-3">
                 <div>
                   <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Artikel hinzufügen</h3>
@@ -424,12 +440,12 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           SCROLLABLE CONTENT — only this region scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className={`flex-1 min-h-0 overflow-hidden`} style={{ touchAction: step === 1 ? 'none' : 'pan-y' }}>
+      <div className="flex-1 min-h-0 overflow-hidden">
           <div className={`max-w-xl mx-auto ${step !== 1 ? 'h-full flex flex-col' : ''}`}>
 
             {/* ── STEP 1: Fixed, no scroll ── */}
             {step === 1 && (
-              <div className="px-4 pt-3 pb-4" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+              <div className="px-4 pt-3 pb-4">
                 <div className="mb-3 flex items-center justify-between">
                   <div>
                     <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{initialOrder ? 'Bestellung bearbeiten' : 'Kopfdaten'}</h3>
@@ -489,10 +505,10 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
             {/* ── STEP 2: Only list scrolls ── */}
             {step === 2 && (
               <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col">
-                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`} style={{ touchAction: 'none' }}>
+                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
-                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
+                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" data-scrollable="true" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
                 {cart.length === 0 ? (
                   <div className={`p-6 border rounded-xl border-dashed text-center text-sm ${isDark ? 'text-slate-500 border-slate-700' : 'text-slate-400 border-slate-300'}`}>Keine Artikel ausgewählt.</div>
                 ) : (
@@ -528,10 +544,10 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
             {/* ── STEP 3: Only list scrolls ── */}
             {step === 3 && (
               <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col">
-                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`} style={{ touchAction: 'none' }}>
+                <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
-                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
+                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" data-scrollable="true" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
                 <div className="space-y-2">
                   {cart.map((line, idx) => {
                     const isDel = line.isDeleted;
@@ -566,7 +582,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
           FIXED BOTTOM BUTTON — always visible, never occluded
           ══════════════════════════════════════════════════════ */}
       <div className={`shrink-0 z-30 border-t fixed bottom-0 left-0 right-0 md:static ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
-        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))', touchAction: 'none' }}>
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
         <div className="max-w-xl mx-auto px-4 pt-2.5 md:flex md:justify-end">
           {step < 3 ? (
             <button onClick={() => setStep(p => (p + 1) as any)} disabled={!canGoNext()}
