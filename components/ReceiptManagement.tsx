@@ -1,5 +1,3 @@
-
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, Filter, Calendar, MapPin, Package, ChevronRight, 
@@ -427,7 +425,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
       if (!selectedBatchId) return;
       // Revert still uses confirm as it's a destructive action (removing stock).
       // Assuming sandbox issue was specific to 'Force Close' context, but safe to keep for now.
-      if (window.confirm("MÃ¶chten Sie die Buchung stornieren? Der Lagerbestand wird entsprechend reduziert.")) {
+      if (window.confirm("Möchten Sie die Buchung stornieren? Der Lagerbestand wird entsprechend reduziert.")) {
           onRevertReceipt(selectedBatchId);
       }
   };
