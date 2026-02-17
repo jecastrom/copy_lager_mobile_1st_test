@@ -332,7 +332,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
           {/* ── Step 2/3 sticky sub-header (title + search) ── */}
           {step === 2 && (
-            <div className="px-4 pb-3">
+            <div className="px-4 pb-3" style={{ touchAction: 'none' }}>
               <div className="flex justify-between items-end mb-3">
                 <div>
                   <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Artikel hinzufügen</h3>
@@ -424,12 +424,12 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           SCROLLABLE CONTENT — only this region scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className={`flex-1 min-h-0 ${step === 1 ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+      <div className={`flex-1 min-h-0 ${step === 1 ? 'overflow-hidden' : 'overflow-hidden'}`} style={{ touchAction: step === 1 ? 'none' : 'auto' }}>
           <div className={`max-w-xl mx-auto ${step !== 1 ? 'h-full flex flex-col' : ''}`}>
 
             {/* ── STEP 1: Fixed, no scroll ── */}
             {step === 1 && (
-              <div className="px-4 pt-3 pb-4">
+              <div className="px-4 pt-3 pb-4" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
                 <div className="mb-3 flex items-center justify-between">
                   <div>
                     <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{initialOrder ? 'Bestellung bearbeiten' : 'Kopfdaten'}</h3>
@@ -492,7 +492,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
                 <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
-                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
+                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
                 {cart.length === 0 ? (
                   <div className={`p-6 border rounded-xl border-dashed text-center text-sm ${isDark ? 'text-slate-500 border-slate-700' : 'text-slate-400 border-slate-300'}`}>Keine Artikel ausgewählt.</div>
                 ) : (
@@ -527,11 +527,11 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
             {/* ── STEP 3: Only list scrolls ── */}
             {step === 3 && (
-              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col">
+              <div className="px-4 pt-3 pb-4 flex-1 min-h-0 flex flex-col" style={{ touchAction: 'none' }}>
                 <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
-                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
+                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" style={{ touchAction: 'pan-y', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
                 <div className="space-y-2">
                   {cart.map((line, idx) => {
                     const isDel = line.isDeleted;
@@ -566,7 +566,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
           FIXED BOTTOM BUTTON — always visible, never occluded
           ══════════════════════════════════════════════════════ */}
       <div className={`shrink-0 z-30 border-t fixed bottom-0 left-0 right-0 md:static ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
-        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))', touchAction: 'none' }}>
         <div className="max-w-xl mx-auto px-4 pt-2.5 md:flex md:justify-end">
           {step < 3 ? (
             <button onClick={() => setStep(p => (p + 1) as any)} disabled={!canGoNext()}
