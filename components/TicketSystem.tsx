@@ -363,13 +363,13 @@ export const TicketSystem: React.FC<TicketSystemProps> = ({
   // --- Layout Classes ---
   const containerClass = `flex flex-col h-full ${isDark ? 'bg-[#0b1120]' : 'bg-gray-50'}`;
   
-  const topBarClass = `flex-none h-8 border-b flex items-center px-4 gap-4 z-10 ${
+  const topBarClass = `flex-none min-h-[36px] border-b flex items-center flex-wrap px-3 md:px-4 gap-x-4 gap-y-1 py-1.5 z-10 ${
       isDark ? 'bg-[#1e293b] border-slate-800' : 'bg-white border-slate-200'
   }`;
 
   const splitViewClass = `flex-1 flex overflow-hidden`;
 
-  const listColumnClass = `w-full md:w-80 flex flex-col border-r ${
+  const listColumnClass = `w-full md:w-64 lg:w-72 flex flex-col border-r shrink-0 ${
       isDark ? 'bg-[#111827] border-slate-800' : 'bg-white border-slate-200'
   } ${selectedTicket ? 'hidden md:flex' : 'flex'}`;
 
@@ -384,41 +384,62 @@ export const TicketSystem: React.FC<TicketSystemProps> = ({
         <div className={topBarClass}>
             {linkedPO ? (
                 <>
-                    <div className="flex items-center gap-2">
-                        <FileText size={14} className={isDark ? 'text-slate-400' : 'text-slate-500'} />
-                        <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                            PO: {linkedPO.id}
+                    <div className="flex items-center gap-1.5">
+                        <FileText size={12} className="text-[#0077B5]" />
+                        <span className={`text-[11px] font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                            {linkedPO.id}
                         </span>
                     </div>
-                    <div className={`w-px h-3 ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}></div>
-                    <div className="flex items-center gap-2">
-                        <Truck size={14} className={isDark ? 'text-slate-400' : 'text-slate-500'} />
-                        <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <span className={`hidden md:inline text-[10px] ${isDark ? 'text-slate-600' : 'text-slate-300'}`}>|</span>
+                    <div className="flex items-center gap-1.5">
+                        <Truck size={12} className={isDark ? 'text-slate-500' : 'text-slate-400'} />
+                        <span className={`text-[11px] ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                             {linkedPO.supplier}
                         </span>
                     </div>
                 </>
             ) : receiptHeader ? (
-                <div className="flex items-center gap-2">
-                    <Truck size={14} className={isDark ? 'text-slate-400' : 'text-slate-500'} />
-                    <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        Lieferung: {receiptHeader.lieferscheinNr}
+                <div className="flex items-center gap-1.5">
+                    <Truck size={12} className="text-[#0077B5]" />
+                    <span className={`text-[11px] font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {receiptHeader.lieferscheinNr}
                     </span>
                 </div>
             ) : (
-                <span className="text-xs italic opacity-50">Keine Kontextdaten verfügbar</span>
+                <span className="text-[11px] italic opacity-50">—</span>
             )}
 
             {receiptHeader && (
-                <div className="ml-auto flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                        receiptHeader.status === 'Offen' ? (isDark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700') :
-                        receiptHeader.status === 'Teillieferung' ? (isDark ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-amber-50 border-amber-200 text-amber-700') :
-                        (isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-600')
-                    }`}>
-                        {receiptHeader.status}
-                    </span>
-                </div>
+                <>
+                    <span className={`hidden md:inline text-[10px] ${isDark ? 'text-slate-600' : 'text-slate-300'}`}>|</span>
+                    <div className="hidden md:flex items-center gap-1.5">
+                        <Calendar size={12} className={isDark ? 'text-slate-500' : 'text-slate-400'} />
+                        <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                            {new Date(receiptHeader.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        </span>
+                    </div>
+                    {receiptHeader.warehouseLocation && (
+                        <>
+                            <span className={`hidden md:inline text-[10px] ${isDark ? 'text-slate-600' : 'text-slate-300'}`}>|</span>
+                            <div className="hidden md:flex items-center gap-1.5">
+                                <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    {receiptHeader.warehouseLocation}
+                                </span>
+                            </div>
+                        </>
+                    )}
+                    {receiptHeader.createdByName && (
+                        <>
+                            <span className={`hidden md:inline text-[10px] ${isDark ? 'text-slate-600' : 'text-slate-300'}`}>|</span>
+                            <div className="hidden md:flex items-center gap-1.5">
+                                <User size={12} className={isDark ? 'text-slate-500' : 'text-slate-400'} />
+                                <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    {receiptHeader.createdByName}
+                                </span>
+                            </div>
+                        </>
+                    )}
+                </>
             )}
         </div>
 
@@ -645,22 +666,22 @@ export const TicketSystem: React.FC<TicketSystemProps> = ({
                                             <Paperclip size={18} />
                                         </button>
                                         
-                                        {/* SPLIT SEND BUTTON */}
+                                        {/* SPLIT SEND BUTTON — Thumb friendly */}
                                         <div className="relative" ref={sendMenuRef}>
                                             <div className="flex shadow-md shadow-blue-500/20">
                                                 <button 
                                                     onClick={() => handleReplyTicket(selectedTicket, false)}
                                                     disabled={!replyText.trim()}
-                                                    className="px-4 py-2 rounded-l-full bg-[#0077B5] hover:bg-[#00A0DC] text-white text-xs font-bold disabled:opacity-50 disabled:bg-slate-500 transition-colors flex items-center gap-2 border-r border-blue-400/30"
+                                                    className="px-5 py-2.5 rounded-l-full bg-[#0077B5] hover:bg-[#00A0DC] text-white text-sm font-bold disabled:opacity-50 disabled:bg-slate-500 transition-colors flex items-center gap-2 border-r border-blue-400/30 active:scale-95"
                                                 >
-                                                    <Send size={14} /> Senden
+                                                    <Send size={16} /> Senden
                                                 </button>
                                                 <button 
                                                     onClick={() => setShowSendOptions(!showSendOptions)}
                                                     disabled={!replyText.trim()}
-                                                    className="px-2 py-2 rounded-r-full bg-[#0077B5] hover:bg-[#00A0DC] text-white disabled:opacity-50 disabled:bg-slate-500 transition-colors"
+                                                    className="px-3.5 py-2.5 rounded-r-full bg-[#0077B5] hover:bg-[#00A0DC] text-white disabled:opacity-50 disabled:bg-slate-500 transition-colors active:scale-95"
                                                 >
-                                                    <ChevronDown size={14} />
+                                                    <ChevronDown size={16} />
                                                 </button>
                                             </div>
 

@@ -2046,8 +2046,8 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
         {/* TICKETS TAB CONTENT - FULL HEIGHT */}
         {activeTab === 'tickets' && (
     <div className="flex-1 flex flex-col overflow-hidden min-h-0 h-full">
-        {/* Status Badges Header */}
-        <div className={`px-4 md:px-6 py-4 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+        {/* Status Badges — centered, not stretched */}
+        <div className={`flex items-center justify-center gap-2 px-3 py-2 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
             <ReceiptStatusBadges
                 header={selectedHeader}
                 master={linkedMaster}
@@ -2057,10 +2057,10 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                 showTicketBadge={true}
             />
         </div>
-        <div className="flex-1 p-4 md:p-6 overflow-hidden min-h-0">
+        <div className="flex-1 p-2 md:p-3 overflow-hidden min-h-0">
                 <TicketSystem 
                     receiptId={selectedBatchId}
-                    tickets={contextTickets} // Use context-aware tickets
+                    tickets={contextTickets}
                     onAddTicket={onAddTicket}
                     onUpdateTicket={onUpdateTicket}
                     theme={theme}
