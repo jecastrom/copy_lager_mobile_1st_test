@@ -120,7 +120,7 @@ export const ReceiptStatusBadges: React.FC<ReceiptStatusBadgesProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="status-pill-stack">
       {badges}
     </div>
   );

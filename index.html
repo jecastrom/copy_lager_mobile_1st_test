@@ -34,6 +34,23 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        /* Standardized status pill layout */
+        .status-pill-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .status-pill-stack > span {
+            min-width: 130px;
+            height: 22px;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-sizing: border-box;
+        }
         /* Shrink native date picker icon */
         input[type="date"]::-webkit-calendar-picker-indicator {
             width: 14px;
