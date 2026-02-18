@@ -1463,25 +1463,25 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                     
                     {/* ═══ MOBILE LAYOUT (default) ═══ */}
                     <div className="lg:hidden">
-                        {/* Row 1: Bestellung + LS */}
+                        {/* Row 1: Bestellung + Lieferschein */}
                         <div className="p-3 pb-2">
-                            <div className="flex items-baseline justify-between gap-3">
+                            <div className="flex items-end justify-between gap-3">
                                 <div className="min-w-0">
                                     <span className={`text-[9px] uppercase font-bold tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bestellung</span>
-                                    <div className={`text-lg font-black font-mono tracking-tight ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-40 italic font-normal text-base'}`}>
+                                    <div className={`text-xl font-extrabold tracking-tight ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-40 italic font-normal text-base'}`}>
                                         {selectedHeader.bestellNr || '—'}
                                     </div>
                                 </div>
                                 <div className="relative shrink-0">
+                                    <span className={`text-[9px] uppercase font-bold tracking-widest block text-right ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Lieferschein</span>
                                     <button 
                                         onClick={() => setShowDeliveryList(!showDeliveryList)}
-                                        className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-colors ${
-                                            isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                                        className={`flex items-center gap-1 mt-0.5 transition-colors ${
+                                            isDark ? 'text-white hover:text-blue-400' : 'text-slate-900 hover:text-[#0077B5]'
                                         }`}
                                     >
-                                        <span className={`text-[9px] uppercase tracking-wider font-bold ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>LS:</span>
-                                        <span className="font-mono">{selectedHeader.lieferscheinNr}</span>
-                                        <ChevronDown size={12} className="opacity-40" />
+                                        <span className="text-lg font-extrabold tracking-tight">{selectedHeader.lieferscheinNr}</span>
+                                        <ChevronDown size={14} className="opacity-40" />
                                     </button>
                                 </div>
                             </div>
@@ -1501,7 +1501,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                 </div>
                             </div>
                             <div className="shrink-0">
-                                {renderActions(detailInspectionState, linkedPO || undefined, selectedHeader || undefined, linkedMaster, 'detail')}
+                                {renderActions(detailInspectionState, linkedPO || undefined, selectedHeader || undefined, linkedMaster, 'detail-mob')}
                             </div>
                         </div>
 
@@ -1536,20 +1536,20 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                 <div className="flex items-baseline gap-4 mb-3">
                                     <div className="flex items-baseline gap-2">
                                         <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bestellung:</span>
-                                        <span className={`text-lg font-black font-mono tracking-tight ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-40 italic font-normal text-base'}`}>
+                                        <span className={`text-xl font-extrabold tracking-tight ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-40 italic font-normal text-base'}`}>
                                             {selectedHeader.bestellNr || '—'}
                                         </span>
                                     </div>
-                                    <div className={`h-4 w-px ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}></div>
+                                    <div className={`h-5 w-px ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}></div>
                                     <div className="relative">
                                         <button 
                                             onClick={() => setShowDeliveryList(!showDeliveryList)}
-                                            className={`flex items-center gap-1.5 text-sm font-bold transition-colors group ${
+                                            className={`flex items-baseline gap-2 transition-colors group ${
                                                 isDark ? 'text-white hover:text-blue-400' : 'text-slate-900 hover:text-[#0077B5]'
                                     }`}
                                 >
-                                    <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>LS:</span>
-                                    {selectedHeader.lieferscheinNr}
+                                    <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Lieferschein:</span>
+                                    <span className="text-xl font-extrabold tracking-tight">{selectedHeader.lieferscheinNr}</span>
                                     <ChevronDown size={14} className={`opacity-50 transition-transform duration-200 ${showDeliveryList ? 'rotate-180' : ''}`} />
                                 </button>
 
@@ -1616,8 +1616,8 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                             </div>
                         </div>
 
-                        {/* Right: Pills stacked + Action menu below */}
-                        <div className="flex flex-col items-end gap-2 shrink-0">
+                        {/* Right: Pills stacked + Action menu below — fixed width column */}
+                        <div className="flex flex-col items-stretch gap-2 shrink-0 min-w-[160px]">
                             <div className="status-pill-stack">
                                 <ReceiptStatusBadges 
                                     header={selectedHeader}
@@ -1627,8 +1627,8 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                     theme={theme}
                                 />
                             </div>
-                            <div className="flex gap-1">
-                                {renderActions(detailInspectionState, linkedPO || undefined, selectedHeader || undefined, linkedMaster, 'detail')}
+                            <div className="flex [&>div]:w-full [&>div>button]:w-full [&>div>button]:justify-center">
+                                {renderActions(detailInspectionState, linkedPO || undefined, selectedHeader || undefined, linkedMaster, 'detail-desk')}
                             </div>
                         </div>
                     </div>
