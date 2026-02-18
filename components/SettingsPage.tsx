@@ -328,6 +328,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       </div>
 
       
+          {/* System & Hilfe */}
+      <div className={`rounded-2xl border overflow-hidden mb-8 ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+        <div className={`px-6 py-3 border-b text-xs font-bold uppercase tracking-wider ${isDark ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
           System & Hilfe
         </div>
 
