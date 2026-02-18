@@ -1481,8 +1481,53 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                         }`}
                                     >
                                         <span className="text-lg font-extrabold tracking-tight">{selectedHeader.lieferscheinNr}</span>
-                                        <ChevronDown size={14} className="opacity-40" />
+                                        <ChevronDown size={14} className={`opacity-40 transition-transform duration-200 ${showDeliveryList ? 'rotate-180' : ''}`} />
                                     </button>
+
+                                    {/* Mobile LS Dropdown */}
+                                    {showDeliveryList && (
+                                        <div className={`absolute top-full right-0 mt-2 w-72 rounded-xl border shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 ${
+                                            isDark ? 'bg-[#1e293b] border-slate-700' : 'bg-white border-slate-200'
+                                        }`}>
+                                            <div className={`p-3 border-b flex justify-between items-center ${isDark ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
+                                                <span className="text-xs font-bold uppercase tracking-wider opacity-70">Alle Lieferungen</span>
+                                                <button onClick={() => setShowDeliveryList(false)} className="hover:bg-red-500/10 hover:text-red-500 p-1 rounded transition-colors"><X size={14}/></button>
+                                            </div>
+                                            <div className="max-h-64 overflow-y-auto">
+                                                {linkedMaster?.deliveries
+                                                    .filter(d => d.lieferscheinNr && d.lieferscheinNr !== 'Ausstehend' && d.lieferscheinNr !== 'Pending')
+                                                    .map((del, idx) => (
+                                                    <button 
+                                                        key={del.id} 
+                                                        onClick={() => handleScrollToDelivery(del.id)}
+                                                        className={`w-full text-left p-3 border-b last:border-0 flex items-center gap-3 transition-colors ${
+                                                        del.lieferscheinNr === selectedHeader.lieferscheinNr 
+                                                            ? (isDark ? 'bg-[#0077B5]/10 border-slate-700' : 'bg-blue-50 border-slate-100')
+                                                            : (isDark ? 'border-slate-800 hover:bg-slate-800' : 'border-slate-100 hover:bg-slate-50')
+                                                        }`}
+                                                    >
+                                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                                                            del.lieferscheinNr === selectedHeader.lieferscheinNr
+                                                            ? 'bg-[#0077B5] text-white'
+                                                            : (isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500')
+                                                        }`}>{idx + 1}</div>
+                                                        <div>
+                                                            <div className={`text-sm font-bold ${del.lieferscheinNr === selectedHeader.lieferscheinNr
+                                                                ? (isDark ? 'text-[#00A0DC]' : 'text-[#0077B5]')
+                                                                : (isDark ? 'text-slate-200' : 'text-slate-700')
+                                                            }`}>{del.lieferscheinNr}</div>
+                                                            <div className="text-[10px] opacity-60">
+                                                                {new Date(del.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })} • {del.items.length} Pos.
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                                {(!linkedMaster || linkedMaster.deliveries.filter(d => d.lieferscheinNr && d.lieferscheinNr !== 'Ausstehend' && d.lieferscheinNr !== 'Pending').length === 0) && (
+                                                    <div className="p-4 text-center text-xs opacity-50">Keine weiteren Lieferungen gefunden.</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
