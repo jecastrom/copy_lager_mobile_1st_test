@@ -1467,13 +1467,13 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                         <div className="p-3 pb-2">
                             <div className="flex items-end justify-between gap-3">
                                 <div className="min-w-0">
-                                    <span className={`text-[9px] uppercase font-bold tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bestellung</span>
+                                    <span className={`text-[11px] uppercase font-bold tracking-wider ${isDark ? 'text-[#0077B5]' : 'text-[#0077B5]'}`}>Bestellung</span>
                                     <div className={`text-xl font-extrabold tracking-tight ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-40 italic font-normal text-base'}`}>
                                         {selectedHeader.bestellNr || '—'}
                                     </div>
                                 </div>
                                 <div className="relative shrink-0">
-                                    <span className={`text-[9px] uppercase font-bold tracking-widest block text-right ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Lieferschein</span>
+                                    <span className={`text-[11px] uppercase font-bold tracking-wider block text-right ${isDark ? 'text-[#0077B5]' : 'text-[#0077B5]'}`}>Lieferschein</span>
                                     <button 
                                         onClick={() => setShowDeliveryList(!showDeliveryList)}
                                         className={`flex items-center gap-1 mt-0.5 transition-colors ${
@@ -1535,7 +1535,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                 {/* PO + LS row */}
                                 <div className="flex items-baseline gap-4 mb-3">
                                     <div className="flex items-baseline gap-2">
-                                        <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bestellung:</span>
+                                        <span className={`text-[11px] uppercase font-bold tracking-wider ${isDark ? 'text-[#0077B5]' : 'text-[#0077B5]'}`}>Bestellung:</span>
                                         <span className={`text-xl font-extrabold tracking-tight ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-40 italic font-normal text-base'}`}>
                                             {selectedHeader.bestellNr || '—'}
                                         </span>
@@ -1548,7 +1548,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                                 isDark ? 'text-white hover:text-blue-400' : 'text-slate-900 hover:text-[#0077B5]'
                                     }`}
                                 >
-                                    <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Lieferschein:</span>
+                                    <span className={`text-[11px] uppercase font-bold tracking-wider ${isDark ? 'text-[#0077B5]' : 'text-[#0077B5]'}`}>Lieferschein:</span>
                                     <span className="text-xl font-extrabold tracking-tight">{selectedHeader.lieferscheinNr}</span>
                                     <ChevronDown size={14} className={`opacity-50 transition-transform duration-200 ${showDeliveryList ? 'rotate-180' : ''}`} />
                                 </button>
