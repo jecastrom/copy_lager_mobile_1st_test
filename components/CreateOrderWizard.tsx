@@ -128,58 +128,6 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
   const [systemDropdownCoords, setSystemDropdownCoords] = useState({ top: 0, left: 0, width: 0 });
 
   useEffect(() => {
-    const origBody = document.body.style.overflow;
-    const origHtml = document.documentElement.style.overflow;
-    const origBodyPos = document.body.style.position;
-    const origBodyWidth = document.body.style.width;
-    const origScrollY = window.scrollY;
-
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.top = `-${origScrollY}px`;
-    document.documentElement.style.overflow = 'hidden';
-
-    const handler = (e: TouchEvent) => {
-      let target = e.target as HTMLElement | null;
-      while (target) {
-        if (target.getAttribute('data-scrollable') === 'true') {
-          const scrollEl = target;
-          const atTop = scrollEl.scrollTop <= 0;
-          const atBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 1;
-          const isScrollingUp = e.touches[0]?.clientY > (handler as any)._lastY;
-          const isScrollingDown = e.touches[0]?.clientY < (handler as any)._lastY;
-          if ((atTop && isScrollingUp) || (atBottom && isScrollingDown)) {
-            e.preventDefault();
-            return;
-          }
-          return;
-        }
-        target = target.parentElement;
-      }
-      e.preventDefault();
-    };
-
-    const trackTouch = (e: TouchEvent) => {
-      (handler as any)._lastY = e.touches[0]?.clientY || 0;
-    };
-
-    document.addEventListener('touchstart', trackTouch, { passive: true });
-    document.addEventListener('touchmove', handler, { passive: false });
-
-    return () => {
-      document.removeEventListener('touchstart', trackTouch);
-      document.removeEventListener('touchmove', handler);
-      document.body.style.overflow = origBody;
-      document.body.style.position = origBodyPos;
-      document.body.style.width = origBodyWidth;
-      document.body.style.top = '';
-      document.documentElement.style.overflow = origHtml;
-      window.scrollTo(0, origScrollY);
-    };
-  }, []);
-
-  useEffect(() => {
     if (initialOrder) {
       setFormData({ orderId: initialOrder.id, supplier: initialOrder.supplier, orderDate: initialOrder.dateCreated, expectedDeliveryDate: initialOrder.expectedDeliveryDate || '', poType: initialOrder.status === 'Projekt' ? 'project' : 'normal' });
       setCart(initialOrder.items.map(i => {
@@ -268,7 +216,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className={`h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ overscrollBehavior: 'none' }}>
+    <div className={`h-full flex flex-col overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ touchAction: 'none', overscrollBehavior: 'none', position: 'relative' }}>
 
       {/* ── SUCCESS / ERROR OVERLAY ── */}
       {(submissionStatus === 'success' || submissionStatus === 'error') && createPortal(
@@ -348,7 +296,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           FIXED HEADER — pinned top, never scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className={`shrink-0 z-20 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+      <div className={`shrink-0 z-20 ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ touchAction: 'none' }}>
         <div className="max-w-xl mx-auto">
           {/* Nav: Back | Steps | Close */}
           <div className="flex items-center justify-between px-4 pt-3 pb-2">
@@ -476,7 +424,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
       {/* ══════════════════════════════════════════════════════
           SCROLLABLE CONTENT — only this region scrolls
           ══════════════════════════════════════════════════════ */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className={`flex-1 min-h-0 ${step === 1 ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           <div className={`max-w-xl mx-auto ${step !== 1 ? 'h-full flex flex-col' : ''}`}>
 
             {/* ── STEP 1: Fixed, no scroll ── */}
@@ -544,7 +492,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
                 <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
-                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" data-scrollable="true" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
+                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
                 {cart.length === 0 ? (
                   <div className={`p-6 border rounded-xl border-dashed text-center text-sm ${isDark ? 'text-slate-500 border-slate-700' : 'text-slate-400 border-slate-300'}`}>Keine Artikel ausgewählt.</div>
                 ) : (
@@ -583,7 +531,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
                 <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 flex-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   Positionen ({cart.filter(c => !c.isDeleted).length})
                 </h4>
-                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1" data-scrollable="true" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
+                <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
                 <div className="space-y-2">
                   {cart.map((line, idx) => {
                     const isDel = line.isDeleted;
