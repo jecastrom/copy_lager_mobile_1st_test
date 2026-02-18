@@ -29,6 +29,8 @@ interface SettingsPageProps {
   onSetEnableSmartImport: (enabled: boolean) => void;
   ticketConfig: TicketConfig;
   onSetTicketConfig: (config: TicketConfig) => void;
+  statusColumnFirst: boolean;
+  onSetStatusColumnFirst: (val: boolean) => void;
   auditTrail?: AuditEntry[];
 }
 
@@ -49,6 +51,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   onSetEnableSmartImport,
   ticketConfig,
   onSetTicketConfig,
+  statusColumnFirst,
+  onSetStatusColumnFirst,
   auditTrail = []
 }) => {
   const isDark = theme === 'dark';
@@ -221,6 +225,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     Voll
                 </button>
             </div>
+          }
+        />
+
+        <SettingRow 
+          icon={<List size={20} />}
+          label="Status-Spalte zuerst in Tabellen"
+          description="Status als erste Spalte in Bestell- und Wareneingangstabellen anzeigen."
+          action={
+            <Toggle checked={statusColumnFirst} onChange={onSetStatusColumnFirst} />
           }
         />
 
