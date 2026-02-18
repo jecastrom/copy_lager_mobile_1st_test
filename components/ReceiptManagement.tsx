@@ -1390,82 +1390,64 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
   const detailInspectionState = getInspectionState(selectedHeader, linkedPO || undefined, linkedMaster || undefined);
 
   return (
-      <div className="h-full flex flex-col animate-in slide-in-from-right-8 duration-300">
+      <div className="h-full flex flex-col animate-in slide-in-from-right-8 duration-300 -m-4 md:-m-6 lg:-m-8">
         {returnModalPortal}
         {returnPickerPortal}
         {problemConfirmPortal}
         {closeConfirmPortal}
       
       {/* TOP NAVIGATION BAR - PERSISTENT */}
-      <div className={`flex-none flex items-center gap-4 px-4 h-14 border-b z-20 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`}>
+      <div className={`flex-none flex items-center gap-0 px-2 md:px-4 h-10 border-b z-20 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`}>
+          {/* Back */}
           <button 
             onClick={handleBack} 
-            className={`flex items-center gap-2 text-sm font-bold transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-bold transition-colors shrink-0 ${isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
           >
-              <ArrowLeft size={18} /> <span className="hidden md:inline">Liste</span>
+              <ArrowLeft size={16} /> <span className="hidden md:inline">Liste</span>
           </button>
           
-          <div className="h-6 w-px bg-slate-500/20 mx-2"></div>
-          
-          {/* TAB PILLS - GMAIL STYLE */}
-          <div className={`flex p-1 rounded-lg ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}>
+          {/* UNDERLINE TABS */}
+          <div className="flex items-end h-full ml-2 md:ml-4 gap-0">
               <button 
                   onClick={() => setActiveTab('items')}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+                  className={`relative flex items-center gap-1.5 px-3 h-full text-xs font-bold transition-colors ${
                       activeTab === 'items' 
-                      ? (isDark ? 'bg-slate-700 text-white shadow-sm' : 'bg-white text-slate-900 shadow-sm') 
-                      : (isDark ? 'text-slate-400 hover:text-slate-300' : 'text-slate-500 hover:text-slate-700')
+                      ? (isDark ? 'text-white' : 'text-slate-900') 
+                      : (isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')
                   }`}
               >
-                  <Package size={14} />
+                  <Package size={13} />
                   Positionen
+                  {activeTab === 'items' && <span className="absolute bottom-0 left-1 right-1 h-[2px] bg-[#0077B5] rounded-full" />}
               </button>
               <button 
                   onClick={() => setActiveTab('tickets')}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+                  className={`relative flex items-center gap-1.5 px-3 h-full text-xs font-bold transition-colors ${
                       activeTab === 'tickets' 
-                      ? (isDark ? 'bg-slate-700 text-white shadow-sm' : 'bg-white text-slate-900 shadow-sm') 
-                      : (isDark ? 'text-slate-400 hover:text-slate-300' : 'text-slate-500 hover:text-slate-700')
+                      ? (isDark ? 'text-white' : 'text-slate-900') 
+                      : (isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')
                   }`}
               >
-                  <MessageSquare size={14} />
+                  <MessageSquare size={13} />
                   Reklamationen
-                  
-                  {/* SPLIT STATUS BADGES */}
-                  <div className="flex gap-1.5 ml-1">
-                      {openTicketsCount > 0 && (
-                          <span className={`px-1.5 py-0.5 rounded-full flex items-center gap-1 border ${
-                              isDark 
-                              ? 'bg-red-500/10 text-red-400 border-red-500/20' 
-                              : 'bg-red-50 text-red-600 border-red-200'
-                          }`}>
-                              <AlertOctagon size={8} />
-                              <span className="text-[9px] font-bold">{openTicketsCount} Offen</span>
-                          </span>
-                      )}
-                      
-                      {closedTicketsCount > 0 && (
-                          <span className={`px-1.5 py-0.5 rounded-full flex items-center gap-1 border ${
-                              isDark 
-                              ? 'bg-slate-800 text-slate-400 border-slate-700' 
-                              : 'bg-slate-100 text-slate-500 border-slate-200'
-                          }`}>
-                              <CheckCircle2 size={8} />
-                              <span className="text-[9px] font-bold">{closedTicketsCount} Erledigt</span>
-                          </span>
-                      )}
-                  </div>
+                  {activeTab === 'tickets' && <span className="absolute bottom-0 left-1 right-1 h-[2px] bg-[#0077B5] rounded-full" />}
+                  {openTicketsCount > 0 && (
+                      <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold leading-none ${
+                          isDark ? 'bg-red-500/15 text-red-400' : 'bg-red-50 text-red-600'
+                      }`}>
+                          {openTicketsCount}
+                      </span>
+                  )}
               </button>
           </div>
 
-          {/* NEW CLOSE BUTTON */}
+          {/* Close */}
           <button 
             onClick={handleBack} 
-            className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isDark ? 'text-slate-400 hover:bg-slate-800 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
-            title="ZurÃ¼ck zur Ãœbersicht"
+            className={`ml-auto p-1.5 rounded-lg transition-colors shrink-0 ${isDark ? 'text-slate-500 hover:bg-slate-800 hover:text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-900'}`}
+            title="Schließen"
           >
-              <span className="hidden md:inline">Schließen</span>
-              <X size={18} />
+              <X size={16} />
           </button>
       </div>
 
@@ -1477,30 +1459,93 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
             <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
                 
                 {/* HEADER PANE - ONLY IN ITEMS VIEW */}
-                <div className={`rounded-xl border flex flex-col p-3 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+                <div className={`rounded-xl border flex flex-col ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                     
-                    {/* Top Row: PO | Divider | LS  <---> Badges | Actions */}
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                        
-                        {/* Left Group */}
-                        <div className="flex items-center gap-4">
-                            {/* PO */}
-                            <div className="flex items-center gap-2">
-                                <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bestellung:</span>
-                                <span className={`text-base font-bold font-mono ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-50 italic font-normal'}`}>
-                                    {selectedHeader.bestellNr || 'â€“'}
-                                </span>
+                    {/* ═══ MOBILE LAYOUT (default) ═══ */}
+                    <div className="lg:hidden">
+                        {/* Row 1: Bestellung + LS */}
+                        <div className="p-3 pb-2">
+                            <div className="flex items-baseline justify-between gap-3">
+                                <div className="min-w-0">
+                                    <span className={`text-[9px] uppercase font-bold tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bestellung</span>
+                                    <div className={`text-lg font-black font-mono tracking-tight ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-40 italic font-normal text-base'}`}>
+                                        {selectedHeader.bestellNr || '—'}
+                                    </div>
+                                </div>
+                                <div className="relative shrink-0">
+                                    <button 
+                                        onClick={() => setShowDeliveryList(!showDeliveryList)}
+                                        className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-colors ${
+                                            isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                                        }`}
+                                    >
+                                        <span className={`text-[9px] uppercase tracking-wider font-bold ${isDark ? 'text-slate-600' : 'text-slate-400'}`}>LS:</span>
+                                        <span className="font-mono">{selectedHeader.lieferscheinNr}</span>
+                                        <ChevronDown size={12} className="opacity-40" />
+                                    </button>
+                                </div>
                             </div>
+                        </div>
 
-                            {/* Divider */}
-                            <div className={`h-4 w-px ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}></div>
+                        {/* Row 2: Status pills + 3-dot menu */}
+                        <div className={`flex items-center gap-3 px-3 py-2 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+                            <div className="flex-1">
+                                <div className="status-pill-stack">
+                                    <ReceiptStatusBadges 
+                                        header={selectedHeader}
+                                        master={linkedMaster} 
+                                        linkedPO={linkedPO} 
+                                        tickets={contextTickets}
+                                        theme={theme}
+                                    />
+                                </div>
+                            </div>
+                            <div className="shrink-0">
+                                {renderActions(detailInspectionState, linkedPO || undefined, selectedHeader || undefined, linkedMaster, 'detail')}
+                            </div>
+                        </div>
 
-                            {/* LS Dropdown */}
-                            <div className="relative">
-                                <button 
-                                    onClick={() => setShowDeliveryList(!showDeliveryList)}
-                                    className={`flex items-center gap-1.5 text-sm font-bold transition-colors group ${
-                                        isDark ? 'text-white hover:text-blue-400' : 'text-slate-900 hover:text-[#0077B5]'
+                        {/* Row 3: Info labels */}
+                        <div className={`grid grid-cols-2 gap-x-4 gap-y-1.5 px-3 py-2.5 border-t text-[11px] ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+                            <div className="flex items-center gap-1.5 col-span-2">
+                                <Truck size={11} className="text-[#0077B5] shrink-0" />
+                                <span className={`font-semibold truncate ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{selectedHeader.lieferant}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <Calendar size={11} className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                                <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>{new Date(selectedHeader.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <MapPin size={11} className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                                <span className={`truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{selectedHeader.warehouseLocation || '—'}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 col-span-2">
+                                <User size={11} className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                                <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>{selectedHeader.createdByName || '—'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ═══ DESKTOP LAYOUT (lg+) ═══ */}
+                    <div className="hidden lg:flex flex-col p-4">
+                        {/* Top: PO + LS left  |  Pills + Actions right */}
+                        <div className="flex items-start justify-between gap-6">
+                            {/* Left: Identity + Info */}
+                            <div className="flex-1 min-w-0">
+                                {/* PO + LS row */}
+                                <div className="flex items-baseline gap-4 mb-3">
+                                    <div className="flex items-baseline gap-2">
+                                        <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Bestellung:</span>
+                                        <span className={`text-lg font-black font-mono tracking-tight ${selectedHeader.bestellNr ? (isDark ? 'text-white' : 'text-slate-900') : 'opacity-40 italic font-normal text-base'}`}>
+                                            {selectedHeader.bestellNr || '—'}
+                                        </span>
+                                    </div>
+                                    <div className={`h-4 w-px ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}></div>
+                                    <div className="relative">
+                                        <button 
+                                            onClick={() => setShowDeliveryList(!showDeliveryList)}
+                                            className={`flex items-center gap-1.5 text-sm font-bold transition-colors group ${
+                                                isDark ? 'text-white hover:text-blue-400' : 'text-slate-900 hover:text-[#0077B5]'
                                     }`}
                                 >
                                     <span className={`text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>LS:</span>
@@ -1559,10 +1604,21 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                             </div>
                         </div>
 
-                        {/* Right Group */}
-                        <div className="flex flex-col sm:flex-row items-center gap-3">
-                             <div className="flex flex-wrap justify-end gap-1.5">
-                                {/* USE CONSISTENT BADGE COMPONENT */}
+                        {/* Info bar */}
+                            <div className={`flex flex-wrap items-center gap-x-5 gap-y-1 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                <span className="font-medium flex items-center gap-1.5"><Truck size={12} className="text-[#0077B5]" /> {selectedHeader.lieferant}</span>
+                                <span className="opacity-20">•</span>
+                                <span className="flex items-center gap-1"><Calendar size={12}/> {new Date(selectedHeader.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                                <span className="opacity-20">•</span>
+                                <span className="flex items-center gap-1"><MapPin size={12}/> {selectedHeader.warehouseLocation || '—'}</span>
+                                <span className="opacity-20">•</span>
+                                <span className="flex items-center gap-1"><User size={12}/> {selectedHeader.createdByName || '—'}</span>
+                            </div>
+                        </div>
+
+                        {/* Right: Pills stacked + Action menu below */}
+                        <div className="flex flex-col items-end gap-2 shrink-0">
+                            <div className="status-pill-stack">
                                 <ReceiptStatusBadges 
                                     header={selectedHeader}
                                     master={linkedMaster} 
@@ -1570,20 +1626,12 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                     tickets={contextTickets}
                                     theme={theme}
                                 />
-                             </div>
-                             <div className="flex gap-1">
+                            </div>
+                            <div className="flex gap-1">
                                 {renderActions(detailInspectionState, linkedPO || undefined, selectedHeader || undefined, linkedMaster, 'detail')}
-                             </div>
+                            </div>
                         </div>
                     </div>
-
-                    {/* Bottom Row: Metadata */}
-                    <div className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-xs mt-2 pt-2 border-t ${isDark ? 'border-slate-800 text-slate-400' : 'border-slate-100 text-slate-500'}`}>
-                        <span className="font-medium flex items-center gap-1.5"><Truck size={12} className="text-[#0077B5]" /> {selectedHeader.lieferant}</span>
-                        <span className="hidden sm:inline opacity-30">•</span>
-                        <span className="flex items-center gap-1"><Calendar size={12}/> {new Date(selectedHeader.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
-                        <span className="flex items-center gap-1"><MapPin size={12}/> {selectedHeader.warehouseLocation}</span>
-                        <span className="flex items-center gap-1 ml-auto"><User size={12}/> {selectedHeader.createdByName || 'â€“'}</span>
                     </div>
                 </div>
 
