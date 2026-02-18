@@ -18,7 +18,6 @@ import { OrderManagement } from './components/OrderManagement';
 import { CreateOrderWizard } from './components/CreateOrderWizard';
 import { SettingsPage, TicketConfig } from './components/SettingsPage';
 import { GlobalSettingsPage } from './components/GlobalSettingsPage';
-import { GlobalSettingsPage } from './components/GlobalSettingsPage';
 import { DocumentationPage } from './components/DocumentationPage';
 import { StockLogView } from './components/StockLogView';
 import { LogicInspector } from './components/LogicInspector';

@@ -1,7 +1,7 @@
 
 
 import React, { useRef, useState } from 'react';
-import { Theme, StockItem, RawGermanItem, ActiveModule, AuditEntry } from '../types';
+import { Theme, StockItem, RawGermanItem, ActiveModule } from '../types';
 import { Book, ChevronRight, Moon, Sun, Monitor, Shield, Info, Upload, Trash2, Database, AlertCircle, CheckCircle2, Users, LayoutPanelLeft, List, LayoutGrid, Bug, Eye } from 'lucide-react';
 
 export interface TicketConfig {
@@ -94,7 +94,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const activeTicketRulesCount = Object.values(ticketConfig).filter(Boolean).length;
+
 
   const SettingRow = ({ icon, label, description, action }: { icon: React.ReactNode, label: string, description: string, action: React.ReactNode }) => (
     <div className={`p-4 flex items-center justify-between border-b last:border-0 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
