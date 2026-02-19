@@ -405,12 +405,12 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
     <div className="h-full flex flex-col animate-in fade-in slide-in-from-right-8 duration-300">
       
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-6">
-        <div>
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <div className="text-center md:text-left">
            <h2 className="text-2xl font-bold mb-1">Artikel & Bestand</h2>
            <p className="text-slate-500 text-sm">Verwalten Sie Ihr gesamtes Inventar an einem Ort.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2 w-full md:w-auto">
             <button
                 onClick={handleExport}
                 className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all border shadow-sm ${

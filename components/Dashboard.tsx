@@ -47,12 +47,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
        {/* Header Actions */}
-       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
-          <div>
+       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-center md:text-left">
              <h2 className="text-2xl font-bold mb-1">Lager Übersicht</h2>
              <p className="text-slate-500 text-sm">Prozess-Status & Bestands-Highlights.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2 w-full md:w-auto">
               <button
                   onClick={() => onNavigate('stock-logs')}
                   className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all ${
