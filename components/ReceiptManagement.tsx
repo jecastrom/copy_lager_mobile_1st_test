@@ -91,7 +91,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
 
   // Mobile action menu state
   const [showMobileActionMenu, setShowMobileActionMenu] = useState<string | null>(null);
-  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false)
   const [archivedReceiptGroups, setArchivedReceiptGroups] = useState<Set<string>>(() => {
     if (typeof window !== 'undefined') {
@@ -443,9 +443,10 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
   };
 
   const handleForceClose = () => {
-     if (!selectedBatchId) return;
-     // Removed window.confirm to fix sandbox compatibility issue
-     onUpdateStatus(selectedBatchId, 'Abgeschlossen');
+     const targetId = showCloseConfirm || selectedBatchId;
+     if (!targetId) return;
+     onUpdateStatus(targetId, 'Abgeschlossen');
+     setShowCloseConfirm(null);
   };
 
   const handleRevert = () => {
@@ -756,7 +757,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
         key: 'close',
         label: 'Schließen',
         icon: Archive,
-        onClick: (e: React.MouseEvent) => { e.stopPropagation(); setShowCloseConfirm(true); },
+        onClick: (e: React.MouseEvent) => { e.stopPropagation(); setShowCloseConfirm(activeHeader.batchId); },
         variant: 'ghost',
         tooltip: 'Abschließen'
       });
@@ -973,7 +974,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
 
   // --- CLOSE CONFIRMATION PORTAL ---
   const closeConfirmPortal = showCloseConfirm && createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" onClick={() => setShowCloseConfirm(false)}>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" onClick={() => setShowCloseConfirm(null)}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div className={`relative w-full max-w-md rounded-2xl border p-6 space-y-4 shadow-2xl ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`} onClick={e => e.stopPropagation()}>
         <div className="flex items-center gap-3">
@@ -992,8 +993,8 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
           <p>• Bei Bedarf können Sie über <strong>„Problem"</strong> eine Korrektur einleiten</p>
         </div>
         <div className="flex gap-3 pt-2">
-          <button onClick={() => setShowCloseConfirm(false)} className={`flex-1 px-4 py-3 rounded-xl font-bold ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}>Abbrechen</button>
-          <button onClick={() => { handleForceClose(); setShowCloseConfirm(false); }} className="flex-1 px-4 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-500">Ja, abschließen</button>
+          <button onClick={() => setShowCloseConfirm(null)} className={`flex-1 px-4 py-3 rounded-xl font-bold ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}>Abbrechen</button>
+          <button onClick={() => { handleForceClose(); setShowCloseConfirm(null); }} className="flex-1 px-4 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-500">Ja, abschließen</button>
         </div>
       </div>
     </div>,
