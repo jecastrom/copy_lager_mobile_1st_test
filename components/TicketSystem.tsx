@@ -572,7 +572,10 @@ export const TicketSystem: React.FC<TicketSystemProps> = ({
                 {selectedTicket ? (
                     <>
                         {/* Chat Header - Compact Row Layout */}
-                        <div className={`flex-none px-3 py-2 border-b flex items-center justify-between gap-3 ${isDark ? 'bg-[#1e293b] border-slate-800' : 'bg-white border-slate-200'}`}>
+                        <div
+                            onDoubleClick={() => { if (selectedTicket) setPopoutTicketId(selectedTicket.id); }}
+                            className={`flex-none px-3 py-2 border-b flex items-center justify-between gap-3 cursor-default ${isDark ? 'bg-[#1e293b] border-slate-800' : 'bg-white border-slate-200'}`}
+                        >
                             <div className="flex items-center gap-3 min-w-0">
                                 <h2 className={`text-base font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                     {selectedTicket.subject}
@@ -604,8 +607,11 @@ export const TicketSystem: React.FC<TicketSystemProps> = ({
                             </div>
                         </div>
 
-                        {/* Chat Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                        {/* Chat Messages — double-click to pop out */}
+                        <div
+                            onDoubleClick={() => { if (selectedTicket) setPopoutTicketId(selectedTicket.id); }}
+                            className="flex-1 overflow-y-auto p-4 space-y-4"
+                        >
                             {(Object.entries(groupedMessages) as [string, TicketMessage[]][]).map(([dateKey, messages]) => {
                                 const isCollapsed = collapsedDates.has(dateKey);
                                 
