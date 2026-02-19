@@ -107,6 +107,8 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
 
   // Mobile: Historie & Notizen collapse state
   const [historieExpanded, setHistorieExpanded] = useState(false);
+  // Track which auto-comments have been "read" (dismissed)
+  const [dismissedAutoIds, setDismissedAutoIds] = useState<Set<string>>(new Set());
   const [statusHistoryExpanded, setStatusHistoryExpanded] = useState(false);
 
   // Return Modal State
@@ -123,6 +125,29 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
   const selectedHeader = useMemo(() => headers.find(h => h.batchId === selectedBatchId), [headers, selectedBatchId]);
   const relatedItems = useMemo(() => items.filter(i => i.batchId === selectedBatchId), [items, selectedBatchId]);
   const relatedComments = useMemo(() => comments.filter(c => c.batchId === selectedBatchId).sort((a,b) => b.timestamp - a.timestamp), [comments, selectedBatchId]);
+  
+  // Unread auto-comments count (userName === 'System' and not dismissed)
+  const unreadAutoComments = useMemo(() => 
+    relatedComments.filter(c => c.userName === 'System' && !dismissedAutoIds.has(c.id)),
+    [relatedComments, dismissedAutoIds]
+  );
+  const dismissAutoComments = () => {
+    const systemIds = relatedComments.filter(c => c.userName === 'System').map(c => c.id);
+    if (systemIds.length > 0) {
+      setDismissedAutoIds(prev => { const next = new Set(prev); systemIds.forEach(id => next.add(id)); return next; });
+    }
+  };
+
+  // Format date as DD.MM.YYYY HH:MM
+  const formatDateDE = (ts: number) => {
+    const d = new Date(ts);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
+  };
   
   // Ticket Context Logic (All tickets for this PO, not just this receipt)
   const linkedPO = useMemo(() => {
@@ -1988,14 +2013,27 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                     {/* PANE C: TRACEABILITY TIMELINE (RIGHT SIDE) */}
                     <div className={`flex-1 rounded-2xl border flex flex-col overflow-hidden ${historieExpanded ? 'min-h-[400px]' : 'lg:min-h-[400px]'} ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                         <button
-                            onClick={() => setHistorieExpanded(!historieExpanded)}
+                            onClick={() => { setHistorieExpanded(!historieExpanded); dismissAutoComments(); }}
                             className={`p-4 border-b font-bold flex items-center gap-2 lg:cursor-default ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'} lg:pointer-events-none`}
                         >
                             <Clock size={18} className="text-slate-500" /> Historie & Notizen
+                            {/* iOS-style notification dot */}
+                            {unreadAutoComments.length > 0 && (
+                                <span className="min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold leading-none flex items-center justify-center bg-red-500 text-white shadow-sm shadow-red-500/30">
+                                    {unreadAutoComments.length}
+                                </span>
+                            )}
+                            {unreadAutoComments.length === 0 && relatedComments.some(c => c.userName === 'System') && (
+                                <span className={`min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold leading-none flex items-center justify-center shadow-sm ${
+                                    isDark ? 'bg-slate-600 text-slate-300 shadow-slate-600/30' : 'bg-slate-400 text-white shadow-slate-400/30'
+                                }`}>
+                                    {relatedComments.filter(c => c.userName === 'System').length}
+                                </span>
+                            )}
                             <ChevronDown size={18} className={`ml-auto lg:hidden transition-transform ${historieExpanded ? 'rotate-180' : ''}`} />
                         </button>
                         
-                        <div className={`flex-1 overflow-y-auto p-4 space-y-6 ${historieExpanded ? 'block' : 'hidden lg:block'}`}>
+                        <div onClick={dismissAutoComments} className={`flex-1 overflow-y-auto p-4 space-y-6 ${historieExpanded ? 'block' : 'hidden lg:block'}`}>
                             {relatedComments.length === 0 ? (
                             <div className="text-center py-10 text-slate-500 text-sm italic">Keine Einträge vorhanden.</div>
                             ) : (
@@ -2011,7 +2049,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                 <div className="space-y-1">
                                     <div className="flex justify-between items-start text-xs">
                                         <span className="font-bold">{c.userName}</span>
-                                        <span className="text-slate-500">{new Date(c.timestamp).toLocaleString()}</span>
+                                        <span className="text-slate-500 font-mono text-[10px]">{formatDateDE(c.timestamp)}</span>
                                     </div>
                                     <div className={`p-3 rounded-xl text-sm ${isDark ? 'bg-slate-800' : 'bg-slate-50'}`}>
                                     {c.message}
@@ -2022,7 +2060,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                             )}
                         </div>
 
-                        <div className={`p-4 border-t ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'} ${historieExpanded ? 'block' : 'hidden lg:block'}`}>
+                        <div onClick={dismissAutoComments} className={`p-4 border-t ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'} ${historieExpanded ? 'block' : 'hidden lg:block'}`}>
                             <div className="flex gap-2 mb-2">
                                 <TypeButton active={commentType === 'note'} icon={<StickyNote size={14} />} label="Notiz" onClick={() => setCommentType('note')} isDark={isDark} />
                                 <TypeButton active={commentType === 'email'} icon={<Mail size={14} />} label="Email" onClick={() => setCommentType('email')} isDark={isDark} />

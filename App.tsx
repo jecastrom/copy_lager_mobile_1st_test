@@ -16,7 +16,7 @@ import { GoodsReceiptFlow } from './components/GoodsReceiptFlow';
 import { ReceiptManagement } from './components/ReceiptManagement';
 import { OrderManagement } from './components/OrderManagement';
 import { CreateOrderWizard } from './components/CreateOrderWizard';
-import { SettingsPage, TicketConfig } from './components/SettingsPage';
+import { SettingsPage, TicketConfig, TimelineConfig } from './components/SettingsPage';
 import { GlobalSettingsPage } from './components/GlobalSettingsPage';
 import { DocumentationPage } from './components/DocumentationPage';
 import { StockLogView } from './components/StockLogView';
@@ -156,6 +156,15 @@ export default function App() {
     }
     return { missing: true, extra: true, damage: true, wrong: true, rejected: true };
   });
+
+  // Timeline Auto-Post Config (Historie & Notizen)
+  const [timelineConfig, setTimelineConfig] = useState<TimelineConfig>(() => {
+    if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('timelineConfig');
+        if (saved) return JSON.parse(saved);
+    }
+    return { missing: true, extra: true, damage: true, wrong: true, rejected: true };
+  });
   
   // Data State
   const [inventory, setInventory] = useState<StockItem[]>(MOCK_ITEMS);
@@ -250,6 +259,11 @@ export default function App() {
   const handleSetTicketConfig = (newConfig: TicketConfig) => {
     setTicketConfig(newConfig);
     localStorage.setItem('ticketConfig', JSON.stringify(newConfig));
+  };
+
+  const handleSetTimelineConfig = (config: TimelineConfig) => {
+    setTimelineConfig(config);
+    localStorage.setItem('timelineConfig', JSON.stringify(config));
   };
 
   // Navigation Handler (Resets Transient State)
@@ -757,6 +771,82 @@ export default function App() {
       issueNotes: c.issueNotes
     }));
     setReceiptItems(prev => [...prev, ...newReceiptItems]);
+
+    // --- 4b. AUTO-POST TO TIMELINE (Historie & Notizen) ---
+    {
+      const tlc = timelineConfig;
+      const autoMessages: string[] = [];
+      const poId = headerData.bestellNr;
+
+      cartItems.forEach((c: any) => {
+        const lbl = `${c.item?.name || c.name} (${c.item?.sku || c.sku})`;
+        const qtyDamaged = c.qtyDamaged || 0;
+        const qtyWrong = c.qtyWrong || 0;
+        const qtyRejected = c.quantityRejected || c.qtyRejected || 0;
+        const notes = c.rejectionNotes || c.issueNotes || '';
+
+        if (tlc.damage && qtyDamaged > 0) {
+          autoMessages.push(`⚠️ Beschädigung: ${lbl}\n   ${qtyDamaged}x beschädigt${notes ? ` — ${notes}` : ''}`);
+        }
+        if (tlc.wrong && qtyWrong > 0) {
+          autoMessages.push(`🚫 Falschlieferung: ${lbl}\n   ${qtyWrong}x falscher Artikel${notes ? ` — ${notes}` : ''}`);
+        }
+        if (tlc.rejected && qtyRejected > 0 && qtyDamaged === 0 && qtyWrong === 0) {
+          autoMessages.push(`❌ Ablehnung: ${lbl}\n   ${qtyRejected}x abgelehnt${notes ? ` — ${notes}` : ''}`);
+        }
+      });
+
+      // Check for shortage (missing)
+      if (tlc.missing && poId) {
+        const linkedPO = purchaseOrders.find(p => p.id === poId);
+        const master = receiptMasters.find(m => m.poId === poId);
+        if (linkedPO) {
+          linkedPO.items.forEach(poItem => {
+            let hist = 0;
+            if (master) master.deliveries.forEach(d => { const di = d.items.find((x: any) => x.sku === poItem.sku); if (di) hist += di.quantityAccepted; });
+            const ci = cartItems.find((c: any) => (c.item?.sku || c.sku) === poItem.sku);
+            const thisDelivery = ci ? (ci.qtyAccepted ?? ci.qty ?? 0) : 0;
+            const total = hist + thisDelivery;
+            const offen = poItem.quantityExpected - total;
+            if (offen > 0) {
+              autoMessages.push(`📦 Fehlmenge: ${poItem.name || poItem.sku} (${poItem.sku})\n   Bestellt: ${poItem.quantityExpected}, Gesamt erhalten: ${total}, Offen: ${offen}`);
+            }
+          });
+        }
+      }
+
+      // Check for overdelivery (extra)
+      if (tlc.extra && poId) {
+        const linkedPO = purchaseOrders.find(p => p.id === poId);
+        const master = receiptMasters.find(m => m.poId === poId);
+        if (linkedPO) {
+          linkedPO.items.forEach(poItem => {
+            let hist = 0;
+            if (master) master.deliveries.forEach(d => { const di = d.items.find((x: any) => x.sku === poItem.sku); if (di) hist += di.quantityAccepted; });
+            const ci = cartItems.find((c: any) => (c.item?.sku || c.sku) === poItem.sku);
+            const thisDelivery = ci ? (ci.qtyAccepted ?? ci.qty ?? 0) : 0;
+            const total = hist + thisDelivery;
+            const zuViel = total - poItem.quantityExpected;
+            if (zuViel > 0) {
+              autoMessages.push(`📈 Übermenge: ${poItem.name || poItem.sku} (${poItem.sku})\n   Bestellt: ${poItem.quantityExpected}, Gesamt erhalten: ${total}, Zu viel: ${zuViel}`);
+            }
+          });
+        }
+      }
+
+      if (autoMessages.length > 0) {
+        const autoComment: ReceiptComment = {
+          id: `auto-${crypto.randomUUID()}`,
+          batchId,
+          userId: 'system',
+          userName: 'System',
+          timestamp: Date.now(),
+          type: 'note',
+          message: `📋 Automatische Prüfmeldung\n\n${autoMessages.join('\n\n')}`
+        };
+        setComments(prev => [autoComment, ...prev]);
+      }
+    }
 
     // --- 5. AUTO-UPDATE TICKETS FOR RETURNS ---
     if (cartItems.some(c => c.quantityRejected > 0) && headerData.bestellNr) {
@@ -1267,6 +1357,8 @@ export default function App() {
                     onSetRequireDeliveryDate={handleSetRequireDeliveryDate}
                     ticketConfig={ticketConfig}
                     onSetTicketConfig={handleSetTicketConfig}
+                    timelineConfig={timelineConfig}
+                    onSetTimelineConfig={handleSetTimelineConfig}
                     auditTrail={auditTrail}
                   />
                 )}

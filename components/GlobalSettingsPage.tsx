@@ -5,7 +5,8 @@ import {
   AlertTriangle, PlusCircle, AlertCircle, Ban, ChevronDown, ChevronUp,
   Info, Clock, FileText, Eye, Lock
 } from 'lucide-react';
-import { TicketConfig } from './SettingsPage';
+import { TicketConfig, TimelineConfig } from './SettingsPage';
+import { MessageSquare } from 'lucide-react';
 
 interface GlobalSettingsPageProps {
   theme: Theme;
@@ -21,6 +22,9 @@ interface GlobalSettingsPageProps {
   // Ticket-Automatisierung
   ticketConfig: TicketConfig;
   onSetTicketConfig: (config: TicketConfig) => void;
+  // Timeline Auto-Posts (Historie & Notizen)
+  timelineConfig: TimelineConfig;
+  onSetTimelineConfig: (config: TimelineConfig) => void;
   // Audit Trail
   auditTrail?: AuditEntry[];
 }
@@ -36,10 +40,13 @@ export const GlobalSettingsPage: React.FC<GlobalSettingsPageProps> = ({
   onSetRequireDeliveryDate,
   ticketConfig,
   onSetTicketConfig,
+  timelineConfig,
+  onSetTimelineConfig,
   auditTrail = []
 }) => {
   const isDark = theme === 'dark';
   const [isTicketConfigOpen, setIsTicketConfigOpen] = useState(false);
+  const [isTimelineConfigOpen, setIsTimelineConfigOpen] = useState(false);
   const [isAuditOpen, setIsAuditOpen] = useState(false);
 
   // ── Reusable Sub-Components ──
@@ -281,6 +288,95 @@ export const GlobalSettingsPage: React.FC<GlobalSettingsPageProps> = ({
               label="Bei Ablehnung"
               description="Erstellt Ticket wenn Positionen komplett abgelehnt wurden."
               action={<Toggle checked={ticketConfig.rejected} onChange={(v) => onSetTicketConfig({ ...ticketConfig, rejected: v })} />}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          CATEGORY 3b: TIMELINE AUTO-POSTS (HISTORIE & NOTIZEN)
+          ═══════════════════════════════════════════════════════ */}
+      <div className={`rounded-2xl border overflow-hidden mb-6 ${
+        isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+      }`}>
+        <button
+          onClick={() => setIsTimelineConfigOpen(!isTimelineConfigOpen)}
+          className={`w-full transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'}`}
+        >
+          <div className={`px-6 py-3 flex items-center justify-between ${
+            isDark ? 'bg-emerald-500/5' : 'bg-emerald-500/5'
+          } ${isTimelineConfigOpen ? 'border-b ' + (isDark ? 'border-slate-800' : 'border-slate-200') : ''}`}>
+            <div className="flex items-center gap-3">
+              <div className={`p-1.5 rounded-lg ${isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-500/10 text-emerald-600'}`}>
+                <MessageSquare size={16} />
+              </div>
+              <div className="text-left">
+                <span className={`text-xs font-bold uppercase tracking-wider block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  Historie & Notizen — Auto-Meldungen
+                </span>
+                <span className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                  Automatische Einträge in der Nachverfolgungsleiste bei Abweichungen
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-500/10 text-emerald-600'
+              }`}>
+                {Object.values(timelineConfig).filter(Boolean).length}/5 aktiv
+              </span>
+              {isTimelineConfigOpen
+                ? <ChevronUp size={16} className="text-slate-400" />
+                : <ChevronDown size={16} className="text-slate-400" />
+              }
+            </div>
+          </div>
+        </button>
+
+        {isTimelineConfigOpen && (
+          <div>
+            <div className={`mx-4 mt-4 mb-3 p-3 rounded-xl border text-xs ${
+              isDark ? 'border-slate-700 text-slate-400 bg-slate-800/50' : 'border-slate-200 text-slate-600 bg-slate-50'
+            }`}>
+              <div className="flex gap-3">
+                <Info size={16} className="shrink-0 mt-0.5 text-emerald-500" />
+                <p>
+                  Wenn aktiviert, wird bei Abweichungen im Wareneingang automatisch ein Eintrag in der
+                  „Historie & Notizen"-Leiste erstellt. Dies dient der lückenlosen Nachverfolgung ohne
+                  ein separates Ticket zu eröffnen.
+                </p>
+              </div>
+            </div>
+
+            <SettingRow
+              icon={<AlertTriangle size={20} className="text-amber-500" />}
+              label="Bei Fehlmengen (Offen)"
+              description="Erstellt Eintrag wenn weniger geliefert als bestellt wurde."
+              action={<Toggle checked={timelineConfig.missing} onChange={(v) => onSetTimelineConfig({ ...timelineConfig, missing: v })} />}
+            />
+            <SettingRow
+              icon={<PlusCircle size={20} className="text-orange-500" />}
+              label="Bei Überlieferung (Zu viel)"
+              description="Erstellt Eintrag wenn mehr geliefert als bestellt wurde."
+              action={<Toggle checked={timelineConfig.extra} onChange={(v) => onSetTimelineConfig({ ...timelineConfig, extra: v })} />}
+            />
+            <SettingRow
+              icon={<AlertCircle size={20} className="text-red-500" />}
+              label="Bei Beschädigung"
+              description="Erstellt Eintrag bei gemeldetem Schaden."
+              action={<Toggle checked={timelineConfig.damage} onChange={(v) => onSetTimelineConfig({ ...timelineConfig, damage: v })} />}
+            />
+            <SettingRow
+              icon={<Ban size={20} className="text-red-500" />}
+              label="Bei Falschlieferung"
+              description="Erstellt Eintrag wenn falscher Artikel geliefert wurde."
+              action={<Toggle checked={timelineConfig.wrong} onChange={(v) => onSetTimelineConfig({ ...timelineConfig, wrong: v })} />}
+            />
+            <SettingRow
+              icon={<Ban size={20} className="text-slate-500" />}
+              label="Bei Ablehnung"
+              description="Erstellt Eintrag wenn Positionen komplett abgelehnt wurden."
+              action={<Toggle checked={timelineConfig.rejected} onChange={(v) => onSetTimelineConfig({ ...timelineConfig, rejected: v })} />}
             />
           </div>
         )}

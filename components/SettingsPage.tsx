@@ -3,11 +3,19 @@ import { Theme, StockItem, RawGermanItem, ActiveModule } from '../types';
 import { Book, ChevronRight, Moon, Sun, Monitor, Shield, Info, Upload, Trash2, Database, AlertCircle, CheckCircle2, Users, LayoutPanelLeft, List, LayoutGrid, Bug, Eye } from 'lucide-react';
 
 export interface TicketConfig {
-  missing: boolean;  // Offen
-  extra: boolean;    // Zu viel
-  damage: boolean;   // Schaden
-  wrong: boolean;    // Falsch
-  rejected: boolean; // Abgelehnt
+  missing: boolean;   // Offen
+  extra: boolean;     // Zu viel
+  damage: boolean;    // Schaden
+  wrong: boolean;     // Falsch
+  rejected: boolean;  // Abgelehnt
+}
+
+export interface TimelineConfig {
+  missing: boolean;
+  extra: boolean;
+  damage: boolean;
+  wrong: boolean;
+  rejected: boolean;
 }
 
 interface SettingsPageProps {
