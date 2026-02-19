@@ -102,6 +102,7 @@ interface TicketSystemProps {
   theme: Theme;
   receiptHeader?: ReceiptHeader;
   linkedPO?: PurchaseOrder;
+  statusBadges?: React.ReactNode;
 }
 
 export const TicketSystem: React.FC<TicketSystemProps> = ({ 
@@ -111,7 +112,8 @@ export const TicketSystem: React.FC<TicketSystemProps> = ({
   onUpdateTicket, 
   theme,
   receiptHeader,
-  linkedPO
+  linkedPO,
+  statusBadges
 }) => {
   const isDark = theme === 'dark';
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
@@ -380,8 +382,8 @@ export const TicketSystem: React.FC<TicketSystemProps> = ({
   return (
     <div className={containerClass}>
         
-        {/* 1. Top Context Bar */}
-        <div className={topBarClass}>
+        {/* 1. Top Context Bar — mobile only when statusBadges provided, always on desktop without */}
+        <div className={`${topBarClass} ${statusBadges ? 'md:hidden' : ''}`}>
             {linkedPO ? (
                 <>
                     <div className="flex items-center gap-1.5">
@@ -446,8 +448,53 @@ export const TicketSystem: React.FC<TicketSystemProps> = ({
         {/* 2. Split View Area */}
         <div className={splitViewClass}>
             
-            {/* Left Column: Ticket List */}
+            {/* Left Column: Info Panel + Ticket List */}
             <div className={listColumnClass}>
+                {/* DESKTOP ONLY: Status Pills + Context Info */}
+                {statusBadges && (
+                    <div className={`hidden md:block border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+                        {/* Pills */}
+                        <div className={`px-3 pt-3 pb-2`}>
+                            {statusBadges}
+                        </div>
+                        {/* Info labels */}
+                        {(receiptHeader || linkedPO) && (
+                            <div className={`px-3 pb-2.5 space-y-1`}>
+                                {linkedPO && (
+                                    <div className="flex items-center gap-1.5">
+                                        <FileText size={11} className="text-[#0077B5] shrink-0" />
+                                        <span className={`text-[11px] font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{linkedPO.id}</span>
+                                    </div>
+                                )}
+                                {(linkedPO?.supplier || receiptHeader?.lieferant) && (
+                                    <div className="flex items-center gap-1.5">
+                                        <Truck size={11} className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                                        <span className={`text-[11px] truncate ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{linkedPO?.supplier || receiptHeader?.lieferant}</span>
+                                    </div>
+                                )}
+                                {receiptHeader && (
+                                    <div className="flex items-center gap-1.5">
+                                        <Calendar size={11} className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                                        <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                            {new Date(receiptHeader.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                        </span>
+                                    </div>
+                                )}
+                                {receiptHeader?.warehouseLocation && (
+                                    <div className="flex items-center gap-1.5">
+                                        <span className={`text-[11px] truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{receiptHeader.warehouseLocation}</span>
+                                    </div>
+                                )}
+                                {receiptHeader?.createdByName && (
+                                    <div className="flex items-center gap-1.5">
+                                        <User size={11} className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                                        <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{receiptHeader.createdByName}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div className={`p-3 border-b flex justify-between items-center ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                     <h3 className={`font-bold text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                         Tickets ({tickets.length})

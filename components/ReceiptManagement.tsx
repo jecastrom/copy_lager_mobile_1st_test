@@ -1431,11 +1431,17 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                   <MessageSquare size={13} />
                   Reklamationen
                   {activeTab === 'tickets' && <span className="absolute bottom-0 left-1 right-1 h-[2px] bg-[#0077B5] rounded-full" />}
+                  {/* iOS-style notification dots */}
                   {openTicketsCount > 0 && (
-                      <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold leading-none ${
-                          isDark ? 'bg-red-500/15 text-red-400' : 'bg-red-50 text-red-600'
-                      }`}>
+                      <span className="ml-1 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold leading-none flex items-center justify-center bg-red-500 text-white shadow-sm shadow-red-500/30">
                           {openTicketsCount}
+                      </span>
+                  )}
+                  {closedTicketsCount > 0 && (
+                      <span className={`${openTicketsCount > 0 ? '-ml-0.5' : 'ml-1'} min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold leading-none flex items-center justify-center shadow-sm ${
+                          isDark ? 'bg-slate-600 text-slate-300 shadow-slate-600/30' : 'bg-slate-400 text-white shadow-slate-400/30'
+                      }`}>
+                          {closedTicketsCount}
                       </span>
                   )}
               </button>
@@ -2046,8 +2052,8 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
         {/* TICKETS TAB CONTENT - FULL HEIGHT */}
         {activeTab === 'tickets' && (
     <div className="flex-1 flex flex-col overflow-hidden min-h-0 h-full">
-        {/* Status Badges — centered, not stretched */}
-        <div className={`flex items-center justify-center gap-2 px-3 py-2 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+        {/* MOBILE ONLY: Status Badges centered on top */}
+        <div className={`flex items-center justify-center gap-2 px-3 py-2 border-b md:hidden ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
             <ReceiptStatusBadges
                 header={selectedHeader}
                 master={linkedMaster}
@@ -2057,7 +2063,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                 showTicketBadge={true}
             />
         </div>
-        <div className="flex-1 p-2 md:p-3 overflow-hidden min-h-0">
+        <div className="flex-1 p-0 overflow-hidden min-h-0">
                 <TicketSystem 
                     receiptId={selectedBatchId}
                     tickets={contextTickets}
@@ -2066,6 +2072,16 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                     theme={theme}
                     receiptHeader={selectedHeader}
                     linkedPO={linkedPO || undefined}
+                    statusBadges={
+                        <ReceiptStatusBadges
+                            header={selectedHeader}
+                            master={linkedMaster}
+                            linkedPO={linkedPO}
+                            tickets={contextTickets}
+                            theme={theme}
+                            showTicketBadge={true}
+                        />
+                    }
                 />
             </div>
     </div>
