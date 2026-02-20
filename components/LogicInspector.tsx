@@ -98,7 +98,7 @@ export const LogicInspector: React.FC<LogicInspectorProps> = ({ orders, receiptM
              badges.push(<span key="dmg" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-red-500/30 bg-red-500/10 text-red-500">SCHADEN</span>);
         }
     } else if (po.linkedReceiptId) {
-         badges.push(<span key="check_legacy" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#6264A7]/30 bg-[#6264A7]/10 text-[#6264A7]">IN PRÜFUNG (LEGACY)</span>);
+         badges.push(<span key="check_legacy" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#6264A7]/30 bg-[#6264A7]/10 text-[#6264A7]">WARTET AUF LIEFERUNG (LEGACY)</span>);
     }
 
     return <div className="flex flex-wrap gap-1">{badges}</div>;

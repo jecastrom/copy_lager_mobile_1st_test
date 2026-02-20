@@ -470,7 +470,7 @@ export default function App() {
             return [...prev, {
                 id: `RM-${Date.now()}`,
                 poId,
-                status: 'In Prüfung' as ReceiptMasterStatus, 
+                status: 'Wartet auf Lieferung' as ReceiptMasterStatus, 
                 deliveries: [initialDelivery]
             }];
         }

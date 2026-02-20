@@ -266,6 +266,9 @@ export function getStatusConfig(status: string | undefined): StatusConfig | null
   if (normalized.includes('wartet') && normalized.includes('lieferung')) {
     return RECEIPT_STATUS_CONFIG['Wartet auf Lieferung'];
   }
+  if (normalized.includes('prüf') || normalized.includes('prüfung')) {
+    return RECEIPT_STATUS_CONFIG['Wartet auf Lieferung'];
+  }
   if (normalized.includes('teil')) return RECEIPT_STATUS_CONFIG['Teillieferung'];
   if (normalized.includes('schaden') && normalized.includes('falsch')) return RECEIPT_STATUS_CONFIG['Schaden + Falsch'];
   if (normalized.includes('schaden') || normalized.includes('beschädigt')) return RECEIPT_STATUS_CONFIG['Schaden'];
