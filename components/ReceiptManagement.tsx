@@ -1593,6 +1593,14 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                 <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>{new Date(selectedHeader.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
+                                <Clock size={11} className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                                <span className={linkedPO?.expectedDeliveryDate ? (isDark ? 'text-slate-400' : 'text-slate-500') : (isDark ? 'text-slate-600' : 'text-slate-400')}>
+                                    {linkedPO?.expectedDeliveryDate
+                                        ? `Erw. Lieferung: ${new Date(linkedPO.expectedDeliveryDate).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                                        : 'Kein Liefertermin'}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
                                 <MapPin size={11} className={`shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
                                 <span className={`truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{selectedHeader.warehouseLocation || '—'}</span>
                             </div>
@@ -1686,6 +1694,8 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                                 <span className="font-medium flex items-center gap-1.5"><Truck size={12} className="text-[#0077B5]" /> {selectedHeader.lieferant}</span>
                                 <span className="opacity-20">•</span>
                                 <span className="flex items-center gap-1"><Calendar size={12}/> {new Date(selectedHeader.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                                <span className="opacity-20">•</span>
+                                <span className={`flex items-center gap-1 ${linkedPO?.expectedDeliveryDate ? '' : 'opacity-40'}`}><Clock size={12}/> {linkedPO?.expectedDeliveryDate ? `Erw.: ${new Date(linkedPO.expectedDeliveryDate).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}` : 'Kein Liefertermin'}</span>
                                 <span className="opacity-20">•</span>
                                 <span className="flex items-center gap-1"><MapPin size={12}/> {selectedHeader.warehouseLocation || '—'}</span>
                                 <span className="opacity-20">•</span>

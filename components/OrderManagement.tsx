@@ -776,6 +776,12 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                         <div>
                             <div className={`text-[10px] uppercase font-bold tracking-wider opacity-60 mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Bestelldatum</div>
                             <div className={`font-medium flex items-center gap-2 ${isDark ? 'text-slate-200' : 'text-slate-700'}`}><Calendar size={16} className="opacity-70" /> {new Date(selectedOrder.dateCreated).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+                            <div className={`mt-2 text-xs flex items-center gap-2 ${selectedOrder.expectedDeliveryDate ? (isDark ? 'text-slate-300' : 'text-slate-600') : (isDark ? 'text-slate-600' : 'text-slate-400')}`}>
+                                <Clock size={12} className="opacity-70" />
+                                {selectedOrder.expectedDeliveryDate
+                                    ? `Erwartete Lieferung: ${new Date(selectedOrder.expectedDeliveryDate).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                                    : 'Liefertermin nicht angegeben'}
+                            </div>
                         </div>
                         
                         {/* LINK MANAGER SECTION */}
