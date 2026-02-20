@@ -266,7 +266,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
       if (['gebucht', 'abgeschlossen', 'in bearbeitung', 'erledigt'].includes(s)) return 'completed';
 
       // 3. PENDING (Default Workload)
-      // Matches In PrÃ¼fung, Partial, Overdelivery, Waiting, or Empty
+      // Matches In Prüfung, Partial, Overdelivery, Waiting, or Empty
       return 'pending';
   };
 

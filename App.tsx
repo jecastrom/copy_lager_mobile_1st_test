@@ -911,7 +911,7 @@ export default function App() {
 
     // --- 6. SIMULATE NOTIFICATION FOR PROJECT COMPLETION ---
     if (isProject && finalReceiptStatus === 'Gebucht') {
-        console.log(`[M365 Mock] Sending email to 'technik-verteiler@dost.de': "Wareneingang fÃ¼r Projekt ${headerData.bestellNr} abgeschlossen. Bereit zur Abholung."`);
+        console.log(`[M365 Mock] Sending email to 'technik-verteiler@dost.de': "Wareneingang für Projekt ${headerData.bestellNr} abgeschlossen. Bereit zur Abholung."`);
         // Visual feedback via setTimeout to allow state to settle or simple alert
         setTimeout(() => {
             alert("ðŸ“§ Automatische E-Mail an das Technik-Team gesendet (Abholbereit).");
