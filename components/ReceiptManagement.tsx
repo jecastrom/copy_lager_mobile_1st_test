@@ -259,7 +259,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
       // 1. ISSUES (Highest Priority)
       // Matches damage, rejection, wrong delivery, or open tickets
       if (hasOpenTickets) return 'issues';
-      if (['schaden', 'abgelehnt', 'falsch', 'beschÃ¤digt'].some(k => s.includes(k))) return 'issues';
+      if (['schaden', 'abgelehnt', 'falsch', 'beschädigt'].some(k => s.includes(k))) return 'issues';
 
       // 2. COMPLETED
       // Matches Booked, Closed, or "In Bearbeitung" (Legacy Default)
@@ -1247,7 +1247,12 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                  const linkedPO = purchaseOrders.find(po => po.id === row.bestellNr);
                  const linkedMaster = receiptMasters.find(m => m.poId === row.bestellNr);
                  const deliveryCount = row.deliveryCount || 1;
-                 const rowTickets = tickets.filter(t => t.receiptId === row.batchId);
+                 const rowTickets = row.isGroup && row.bestellNr
+  ? tickets.filter(t => {
+      const h = headers.find(hdr => hdr.batchId === t.receiptId);
+      return h?.bestellNr === row.bestellNr;
+    })
+  : tickets.filter(t => t.receiptId === row.batchId);
                  const inspectionState = getInspectionState(row, linkedPO, linkedMaster);
 
                  return (
