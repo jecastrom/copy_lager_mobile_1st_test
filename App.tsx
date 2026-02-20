@@ -328,17 +328,32 @@ export default function App() {
       const header = receiptHeaders.find(h => h.batchId === batchId);
       if (header?.bestellNr) {
         const poId = header.bestellNr;
-        // Update receipt master status
-        setReceiptMasters(prev => prev.map(m => m.poId === poId ? { ...m, status: 'Abgeschlossen' as ReceiptMasterStatus } : m));
-        // Update PO: set isForceClosed + status Abgeschlossen
-        setPurchaseOrders(prev => prev.map(po => {
-          if (po.id !== poId) return po;
-          let nextStatus = po.status;
-          if (po.status !== 'Projekt' && po.status !== 'Lager') {
-            nextStatus = 'Abgeschlossen';
-          }
-          return { ...po, status: nextStatus, isForceClosed: true };
-        }));
+        const master = receiptMasters.find(m => m.poId === poId);
+        const wasPreReceipt = master?.status === 'Wartet auf Lieferung';
+
+        if (wasPreReceipt) {
+          // PRE-RECEIPT CANCEL: No goods were received — reset PO to Offen
+          setReceiptMasters(prev => prev.map(m => m.poId === poId ? { ...m, status: 'Abgeschlossen' as ReceiptMasterStatus } : m));
+          setPurchaseOrders(prev => prev.map(po => {
+            if (po.id !== poId) return po;
+            let nextStatus = po.status;
+            if (po.status !== 'Projekt' && po.status !== 'Lager') {
+              nextStatus = 'Offen';
+            }
+            return { ...po, status: nextStatus, linkedReceiptId: undefined, isForceClosed: false };
+          }));
+        } else {
+          // NORMAL CLOSE: Actual inspection happened — mark as Abgeschlossen
+          setReceiptMasters(prev => prev.map(m => m.poId === poId ? { ...m, status: 'Abgeschlossen' as ReceiptMasterStatus } : m));
+          setPurchaseOrders(prev => prev.map(po => {
+            if (po.id !== poId) return po;
+            let nextStatus = po.status;
+            if (po.status !== 'Projekt' && po.status !== 'Lager') {
+              nextStatus = 'Abgeschlossen';
+            }
+            return { ...po, status: nextStatus, isForceClosed: true };
+          }));
+        }
       }
     }
   };
