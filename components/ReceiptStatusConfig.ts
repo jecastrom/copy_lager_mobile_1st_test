@@ -49,31 +49,9 @@ export const RECEIPT_STATUS_CONFIG: Record<ReceiptMasterStatus, StatusConfig> = 
     }
   },
   
-  'Wartet auf Prüfung': {
-    key: 'wartet-pruefung',
-    displayName: 'Wartet auf Prüfung',
-    description: 'Wareneingang wurde vorerfasst und wartet auf Prüfung durch das Team.',
-    actionText: 'Jetzt prüfen',
-    icon: PackagePlus,
-    colorClass: {
-      light: {
-        bg: 'bg-purple-50',
-        text: 'text-purple-700',
-        border: 'border-purple-200',
-        badge: 'bg-purple-50 text-purple-600 border-purple-200'
-      },
-      dark: {
-        bg: 'bg-purple-500/10',
-        text: 'text-purple-400',
-        border: 'border-purple-500/20',
-        badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-      }
-    }
-  },
-
-  'In Prüfung': {
-    key: 'in-pruefung',
-    displayName: 'In Prüfung',
+  'Wartet auf Lieferung': {
+    key: 'wartet-lieferung',
+    displayName: 'Wartet auf Lieferung',
     description: 'Bestellung noch offen. Es wurden noch nicht alle Artikel geliefert.',
     actionText: 'Weitere Lieferung erfassen',
     icon: Truck,
@@ -285,9 +263,8 @@ export function getStatusConfig(status: string | undefined): StatusConfig | null
   }
   
   // Fuzzy match for common variations
-  if (normalized.includes('prüf')) {
-    if (normalized.includes('wartet')) return RECEIPT_STATUS_CONFIG['Wartet auf Prüfung'];
-    return RECEIPT_STATUS_CONFIG['In Prüfung'];
+  if (normalized.includes('wartet') && normalized.includes('lieferung')) {
+    return RECEIPT_STATUS_CONFIG['Wartet auf Lieferung'];
   }
   if (normalized.includes('teil')) return RECEIPT_STATUS_CONFIG['Teillieferung'];
   if (normalized.includes('schaden') && normalized.includes('falsch')) return RECEIPT_STATUS_CONFIG['Schaden + Falsch'];

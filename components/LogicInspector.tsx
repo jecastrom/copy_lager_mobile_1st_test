@@ -91,8 +91,8 @@ export const LogicInspector: React.FC<LogicInspectorProps> = ({ orders, receiptM
 
     // Strict Action (The "In Prüfung" Logic)
     if (master) {
-        if (master.status === 'In Prüfung' || master.status === 'Wartet auf Prüfung') {
-             badges.push(<span key="check" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#6264A7]/30 bg-[#6264A7]/10 text-[#6264A7]">IN PRÜFUNG</span>);
+        if (master.status === 'Wartet auf Lieferung') {
+             badges.push(<span key="check" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#6264A7]/30 bg-[#6264A7]/10 text-[#6264A7]">WARTET AUF LIEFERUNG</span>);
         }
         if ((master.status as string) === 'Schaden') {
              badges.push(<span key="dmg" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-red-500/30 bg-red-500/10 text-red-500">SCHADEN</span>);
@@ -131,8 +131,8 @@ export const LogicInspector: React.FC<LogicInspectorProps> = ({ orders, receiptM
     }
 
     // Master Status
-    if (status === 'In Prüfung' || status === 'Wartet auf Prüfung') {
-        badges.push(<span key="check" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#6264A7]/30 bg-[#6264A7]/10 text-[#6264A7]">IN PRÜFUNG</span>);
+    if (status === 'Wartet auf Lieferung') {
+        badges.push(<span key="check" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#6264A7]/30 bg-[#6264A7]/10 text-[#6264A7]">WARTET AUF LIEFERUNG</span>);
     } else if ((status as string) === 'Gebucht' || (status as string) === 'Abgeschlossen') {
         badges.push(<span key="booked" className="px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-500">GEBUCHT</span>);
     } else if ((status as string) === 'Schaden') {

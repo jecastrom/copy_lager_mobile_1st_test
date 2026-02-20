@@ -544,7 +544,7 @@ export const DocumentationPage: React.FC<DocumentationPageProps> = ({ theme, onB
             <div className="space-y-2">
               <p className="text-xs">{t('Zeigt Qualitätsprobleme aus dem ReceiptMaster-Status.', 'Shows quality issues from the ReceiptMaster status.')}</p>
               <div className="flex flex-wrap gap-2">
-                <StatusPill label="IN PRÜFUNG" color={isDark ? 'bg-[#6264A7]/20 text-[#9ea0e6] border-[#6264A7]/40' : 'bg-[#6264A7]/10 text-[#6264A7] border-[#6264A7]/20'} />
+                <StatusPill label="WARTET AUF LIEFERUNG" color={isDark ? 'bg-[#6264A7]/20 text-[#9ea0e6] border-[#6264A7]/40' : 'bg-[#6264A7]/10 text-[#6264A7] border-[#6264A7]/20'} />
                 <StatusPill label="SCHADEN" color={isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-600 border-red-200'} />
                 <StatusPill label="FALSCH" color={isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-600 border-red-200'} />
                 <StatusPill label="ABGELEHNT" color={isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-600 border-red-200'} />
@@ -562,7 +562,7 @@ export const DocumentationPage: React.FC<DocumentationPageProps> = ({ theme, onB
                 <div><strong>Schaden:</strong> {t('Beschädigte Ware erkannt', 'Damaged goods detected')}</div>
                 <div><strong>Falsch geliefert:</strong> {t('Falsche Artikel erhalten', 'Wrong items received')}</div>
                 <div><strong>Schaden + Falsch:</strong> {t('Kombination aus beiden', 'Combination of both')}</div>
-                <div><strong>In Prüfung:</strong> {t('Wartet auf manuelle Inspektion', 'Waiting for manual inspection')}</div>
+                <div><strong>Wartet auf Lieferung:</strong> {t('Bestellung offen, wartet auf Wareneingang', 'Order open, waiting for goods receipt')}</div>
                 <div><strong>Abgeschlossen:</strong> {t('Manuell abgeschlossen (Force Close)', 'Manually closed (Force Close)')}</div>
               </div>
             </div>

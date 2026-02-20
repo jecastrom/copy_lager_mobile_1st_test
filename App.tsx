@@ -432,7 +432,7 @@ export default function App() {
       bestellNr: po.id,
       lieferdatum: new Date().toISOString().split('T')[0],
       lieferant: po.supplier,
-      status: 'In Prüfung',
+      status: 'Wartet auf Lieferung',
       timestamp,
       itemCount: 0,
       warehouseLocation: 'Wareneingang',

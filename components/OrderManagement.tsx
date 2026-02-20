@@ -133,12 +133,12 @@ const OrderStatusBadges = ({ order, linkedReceipt, theme }: { order: PurchaseOrd
     // --- BADGE 3: RECEIPT PROCESS ---
     if (linkedReceipt) {
         const s = linkedReceipt.status as string;
-        if (s === 'In Prüfung' || s === 'Wartet auf Prüfung') {
+        if (s === 'Wartet auf Lieferung') {
             badges.push(
                 <span key="proc-check" className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${
                     isDark ? 'bg-[#6264A7]/20 text-[#9ea0e6] border-[#6264A7]/40' : 'bg-[#6264A7]/10 text-[#6264A7] border-[#6264A7]/20'
                 }`}>
-                    In Prüfung
+                    Wartet auf Lieferung
                 </span>
             );
         } else if (s === 'Schaden' || s === 'Beschädigt') {
@@ -1150,7 +1150,7 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
             <div className={`relative w-full max-w-sm rounded-2xl shadow-2xl p-6 flex flex-col gap-4 animate-in zoom-in-95 duration-200 ${isDark ? 'bg-slate-900 border border-slate-700' : 'bg-white'}`}>
                 <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-full shrink-0 ${isDark ? 'bg-purple-500/20 text-purple-400' : 'bg-purple-100 text-purple-600'}`}><PackagePlus size={24} /></div>
-                    <div><h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Wareneingang erstellen?</h3><p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Status wird auf 'Wartet auf Prüfung' gesetzt.</p></div>
+                    <div><h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Wareneingang erstellen?</h3><p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Status wird auf 'Wartet auf Lieferung' gesetzt.</p></div>
                 </div>
                 <div className="flex justify-end gap-3 mt-2">
                     <button onClick={handleCancelQuickReceipt} className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${isDark ? 'hover:bg-slate-800 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>Abbrechen</button>
