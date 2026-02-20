@@ -1240,7 +1240,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
              {filteredRows.length === 0 ? (
                <div className="p-8 text-center text-slate-500">
                  <Package size={32} className="mx-auto mb-3 opacity-30" />
-                 <p>Keine EintrÃ¤ge gefunden</p>
+                 <p>Keine Einträge gefunden</p>
                </div>
              ) : (
                filteredRows.map(row => {
@@ -1371,11 +1371,11 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                       )}
                       <td className="p-4 text-center">
                         {linkedPO?.pdfUrl ? (
-                           <div className="flex justify-center" title="BestÃ¤tigung vorhanden">
+                           <div className="flex justify-center" title="Bestätigung vorhanden">
                              <CheckCircle2 size={18} className="text-emerald-500" />
                            </div>
                         ) : (
-                           <div className="flex justify-center opacity-30" title="Keine BestÃ¤tigung">
+                           <div className="flex justify-center opacity-30" title="Keine Bestätigung">
                              <Ban size={18} className="text-slate-500" />
                            </div>
                         )}
