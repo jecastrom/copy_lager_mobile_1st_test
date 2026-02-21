@@ -102,7 +102,24 @@ export const ReceiptStatusBadges: React.FC<ReceiptStatusBadgesProps> = ({
     );
   }
 
-  // --- BADGE 3: OPEN TICKETS (OPTIONAL) ---
+  // --- BADGE 3: DELIVERY TIMING (COMPUTED FROM DATE) ---
+  const deliveryBadge = getDeliveryDateBadge(linkedPO?.expectedDeliveryDate, effectiveStatus);
+  if (deliveryBadge) {
+    const dConfig = getStatusConfig(deliveryBadge);
+    if (dConfig) {
+      const dBadgeColors = isDark ? dConfig.colorClass.dark.badge : dConfig.colorClass.light.badge;
+      badges.push(
+        <span
+          key="delivery-timing"
+          className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider whitespace-nowrap ${dBadgeColors}`}
+        >
+          {dConfig.displayName}
+        </span>
+      );
+    }
+  }
+
+  // --- BADGE 4: OPEN TICKETS (OPTIONAL) ---
   if (showTicketBadge && tickets && tickets.length > 0) {
     const openTicketsCount = tickets.filter(t => t.status === 'Open').length;
     if (openTicketsCount > 0) {

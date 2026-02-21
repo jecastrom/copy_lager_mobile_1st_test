@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { PurchaseOrder, Theme, ReceiptMaster, ActiveModule, Ticket } from '../types';
 import { LifecycleStepper } from './LifecycleStepper';
+import { getStatusConfig, getDeliveryDateBadge } from './ReceiptStatusConfig';
 import { MOCK_ITEMS } from '../data'; // Import Mock Data for System Lookup
 
 // --- HELPER: MATH LOGIC FOR COMPLETION ---
@@ -182,6 +183,21 @@ const OrderStatusBadges = ({ order, linkedReceipt, theme }: { order: PurchaseOrd
                     isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-600 border-red-200'
                 }`}>
                     <Ban size={10} /> Abgelehnt
+                </span>
+            );
+        }
+    }
+
+    // --- BADGE 4: DELIVERY TIMING (COMPUTED FROM DATE) ---
+    const effectiveStatus = linkedReceipt?.status as string || (isOrderComplete(order) || order.isForceClosed ? 'Abgeschlossen' : order.status === 'Storniert' ? 'Storniert' : '');
+    const deliveryBadge = getDeliveryDateBadge(order.expectedDeliveryDate, effectiveStatus);
+    if (deliveryBadge) {
+        const dConfig = getStatusConfig(deliveryBadge);
+        if (dConfig) {
+            const badgeColors = isDark ? dConfig.colorClass.dark.badge : dConfig.colorClass.light.badge;
+            badges.push(
+                <span key="delivery-timing" className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${badgeColors}`}>
+                    {dConfig.displayName}
                 </span>
             );
         }
@@ -865,7 +881,7 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                 </div>
 
                <div className={`px-6 py-6 border-b ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50/50 border-slate-100'}`}>
-                    <LifecycleStepper status={getVisualLifecycleStatus(selectedOrder)} hasOpenTickets={hasOpenTickets} receiptStatus={receiptMasters.find(m => m.poId === selectedOrder.id)?.status} theme={theme} />
+                    <LifecycleStepper status={getVisualLifecycleStatus(selectedOrder)} hasOpenTickets={hasOpenTickets} receiptStatus={receiptMasters.find(m => m.poId === selectedOrder.id)?.status} expectedDeliveryDate={selectedOrder.expectedDeliveryDate} theme={theme} />
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-0">

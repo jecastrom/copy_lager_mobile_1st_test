@@ -1,18 +1,23 @@
 import React from 'react';
 import { ShoppingCart, Truck, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Theme } from '../types';
+import { getDeliveryDateBadge } from './ReceiptStatusConfig';
 
 interface LifecycleStepperProps {
   status: string;
   hasOpenTickets: boolean;
   receiptStatus?: string;
+  expectedDeliveryDate?: string;
   theme: Theme;
 }
 
 type StepState = 'completed' | 'current' | 'pending' | 'issue';
 
-export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({ status, hasOpenTickets, receiptStatus, theme }) => {
+export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({ status, hasOpenTickets, receiptStatus, expectedDeliveryDate, theme }) => {
   const isDark = theme === 'dark';
+
+  // --- Delivery date awareness ---
+  const deliveryDateStatus = getDeliveryDateBadge(expectedDeliveryDate, status === 'Abgeschlossen' ? 'Abgeschlossen' : status);
 
   // --- Logic to determine the state of Step 2 (Wareneingang) ---
   const rs = (receiptStatus || '').toLowerCase();
@@ -21,14 +26,20 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({ status, hasO
   const getStep2State = (): StepState => {
     // Priority 1: Issues from tickets OR receipt quality problems
     if (hasOpenTickets || hasReceiptIssues) return 'issue';
+
+    // Priority 1b: Verspätet = issue on step 2
+    if (deliveryDateStatus === 'Verspätet') return 'issue';
     
     // Priority 2: Completed (only if receipt is also clean)
     if (status === 'Abgeschlossen') return 'completed';
     
     // Priority 3: In Progress (Partial or In Check)
-    if (status === 'Teilweise geliefert' || status === 'Teillieferung' || status === 'In Prüfung' || status === 'Wartet auf Prüfung') {
+    if (status === 'Teilweise geliefert' || status === 'Teillieferung' || status === 'Wartet auf Lieferung') {
         return 'current';
     }
+
+    // Priority 3b: Lieferung heute/morgen = current (delivery imminent)
+    if (deliveryDateStatus === 'Lieferung heute' || deliveryDateStatus === 'Lieferung morgen') return 'current';
     
     // Default: Pending (e.g. 'Offen', 'Projekt')
     return 'pending';
@@ -50,7 +61,7 @@ export const LifecycleStepper: React.FC<LifecycleStepperProps> = ({ status, hasO
     },
     { 
         id: 2, 
-        label: 'Wareneingang', 
+        label: deliveryDateStatus === 'Verspätet' ? 'Verspätet!' : deliveryDateStatus === 'Lieferung heute' ? 'Heute!' : deliveryDateStatus === 'Lieferung morgen' ? 'Morgen' : 'Wareneingang', 
         icon: Truck, 
         state: getStep2State() 
     },

@@ -346,3 +346,40 @@ export function getStatusConfig(status: string | undefined): StatusConfig | null
   
   return null;
 }
+
+/**
+ * Compute delivery-date-based status from expectedDeliveryDate.
+ * Returns 'Lieferung morgen' | 'Lieferung heute' | 'Verspätet' | null.
+ * Pure display helper — call on every render, no storage needed.
+ */
+export function getDeliveryDateBadge(
+  expectedDeliveryDate?: string,
+  currentStatus?: string
+): 'Lieferung morgen' | 'Lieferung heute' | 'Verspätet' | null {
+  if (!expectedDeliveryDate) return null;
+
+  // Suppress for completed/closed/cancelled statuses
+  const suppressStatuses = ['Abgeschlossen', 'Gebucht', 'Storniert'];
+  if (currentStatus && suppressStatuses.includes(currentStatus)) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const expected = new Date(expectedDeliveryDate);
+  expected.setHours(0, 0, 0, 0);
+
+  if (expected.getTime() === today.getTime()) return 'Lieferung heute';
+  if (expected.getTime() === tomorrow.getTime()) return 'Lieferung morgen';
+
+  if (expected.getTime() < today.getTime()) {
+    // Only show Verspätet for open/partial/waiting statuses
+    const lower = (currentStatus || '').toLowerCase();
+    const isOpenish = !currentStatus || lower === 'offen' || lower.includes('teil') || lower.includes('wartet');
+    if (isOpenish) return 'Verspätet';
+  }
+
+  return null;
+}
