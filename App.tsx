@@ -657,7 +657,7 @@ export default function App() {
                      // FORCE CLOSE: Treat as 'Gebucht' regardless of math
                      finalReceiptStatus = 'Gebucht'; 
                  } else if (totalReceivedIncludingCurrent > totalOrdered) {
-                     finalReceiptStatus = 'Übermenge'; // Fixed form ÃƒÅ“bermenge
+                     finalReceiptStatus = 'Übermenge';
                  } else if (totalReceivedIncludingCurrent < totalOrdered) {
                      // If we received less than total ordered, it is Partial.
                      finalReceiptStatus = 'Teillieferung';
@@ -914,7 +914,7 @@ export default function App() {
         console.log(`[M365 Mock] Sending email to 'technik-verteiler@dost.de': "Wareneingang für Projekt ${headerData.bestellNr} abgeschlossen. Bereit zur Abholung."`);
         // Visual feedback via setTimeout to allow state to settle or simple alert
         setTimeout(() => {
-            alert("ðŸ“§ Automatische E-Mail an das Technik-Team gesendet (Abholbereit).");
+            alert("📧 Automatische E-Mail an das Technik-Team gesendet (Abholbereit).");
         }, 500);
     }
 
