@@ -680,9 +680,12 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                     <td className="px-4 py-3 align-middle">
                         <div className="flex flex-col text-slate-500 text-xs">
                             <span className="flex items-center gap-2 font-bold mb-0.5"><Calendar size={12} /> {new Date(order.dateCreated).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
-                            {order.expectedDeliveryDate && isOrderLate(order) && (
-                                <span className="text-red-500 font-bold flex items-center gap-1"><Clock size={10} /> Fällig: {new Date(order.expectedDeliveryDate).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}</span>
-                            )}
+                            <span className={`flex items-center gap-1 ${order.expectedDeliveryDate && isOrderLate(order) ? 'text-red-500 font-bold' : 'opacity-60'}`}>
+                                <Clock size={10} />
+                                {order.expectedDeliveryDate
+                                    ? `${isOrderLate(order) ? 'Fällig' : 'Erw.'}: ${new Date(order.expectedDeliveryDate).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                                    : 'Kein Liefertermin'}
+                            </span>
                         </div>
                     </td>
                     <td className="px-4 py-3 align-middle font-medium">

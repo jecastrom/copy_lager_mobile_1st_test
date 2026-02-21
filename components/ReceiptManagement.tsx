@@ -1395,6 +1395,11 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                         <div className="flex flex-col">
                           <span className="flex items-center gap-1.5"><Calendar size={12}/> {new Date(row.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                           <span className="flex items-center gap-1.5 mt-1 text-xs opacity-70"><User size={12}/> {row.createdByName || 'Unbekannt'}</span>
+                          {(() => { const po = row.bestellNr ? purchaseOrders.find(p => p.id === row.bestellNr) : null; return (
+                            <span className={`flex items-center gap-1.5 mt-1 text-xs ${po?.expectedDeliveryDate ? 'opacity-70' : 'opacity-40'}`}>
+                              <Clock size={12}/> {po?.expectedDeliveryDate ? `Erw.: ${new Date(po.expectedDeliveryDate).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}` : 'Kein Liefertermin'}
+                            </span>
+                          ); })()}
                         </div>
                       </td>
                       <td className="p-4 text-right text-slate-400 flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
