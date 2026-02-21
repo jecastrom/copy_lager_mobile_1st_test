@@ -215,7 +215,6 @@ interface OrderManagementProps {
   onArchive: (id: string) => void;
   onEdit: (order: PurchaseOrder) => void;
   onReceiveGoods: (id: string) => void;
-  onQuickReceipt: (id: string) => void;
   onCancelOrder: (id: string) => void;
   onUpdateOrder: (order: PurchaseOrder) => void; // New prop for saving link
   receiptMasters: ReceiptMaster[];
@@ -230,7 +229,6 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
     onArchive, 
     onEdit, 
     onReceiveGoods, 
-    onQuickReceipt, 
     onCancelOrder, 
     onUpdateOrder,
     receiptMasters, 
@@ -245,9 +243,7 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
   
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
 
-  // -- Confirmation Modal State --
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [selectedOrderForReceipt, setSelectedOrderForReceipt] = useState<string | null>(null);
+  
 
   // -- Link Management State (Local to Component) --
   const [isEditingLink, setIsEditingLink] = useState(false);
@@ -424,22 +420,7 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
     setActiveMenuId(null);
   };
 
-  const handleQuickReceiptClick = (id: string) => {
-    setSelectedOrderForReceipt(id);
-    setConfirmModalOpen(true);
-    setActiveMenuId(null);
-  };
-
-  const handleConfirmQuickReceipt = () => {
-    if (selectedOrderForReceipt) onQuickReceipt(selectedOrderForReceipt);
-    setConfirmModalOpen(false);
-    setSelectedOrderForReceipt(null);
-  };
-
-  const handleCancelQuickReceipt = () => {
-    setConfirmModalOpen(false);
-    setSelectedOrderForReceipt(null);
-  };
+  
 
   const handleCancelOrderClick = (id: string) => {
       onCancelOrder(id);
@@ -626,9 +607,6 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                            {!order.isArchived && !isDone && order.status !== 'Storniert' && (
                              <>
                                <MenuItem icon={ClipboardCheck} label="Wareneingang prüfen" onClick={() => handleReceiveClick(order.id)} />
-                               {!order.linkedReceiptId && (
-                                 <MenuItem icon={PackagePlus} label="Schnell-Buchung" onClick={() => handleQuickReceiptClick(order.id)} />
-                               )}
                                <div className={`h-px my-1 ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}></div>
                                <MenuItem icon={Edit2} label="Bearbeiten" onClick={() => handleEditClick(order)} />
                              </>
@@ -746,9 +724,6 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                                         {!order.isArchived && !isDone && order.status !== 'Storniert' && (
                                             <>
                                                 <MenuItem icon={ClipboardCheck} label="Wareneingang prüfen" onClick={() => handleReceiveClick(order.id)} />
-                                                {!order.linkedReceiptId && (
-                                                    <MenuItem icon={PackagePlus} label="Schnell-Buchung" onClick={() => handleQuickReceiptClick(order.id)} />
-                                                )}
                                                 <div className={`h-px my-1 ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}></div>
                                                 <MenuItem icon={Edit2} label="Bearbeiten" onClick={() => handleEditClick(order)} />
                                             </>
@@ -1062,26 +1037,6 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                                         }}
                                     >
                                         <div className="flex flex-col gap-1">
-                                            {/* Erstellen - Quick Receipt */}
-                                            {!selectedOrder.isArchived && !isOrderComplete(selectedOrder) && !selectedOrder.linkedReceiptId && selectedOrder.status !== 'Storniert' && (
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedOrderForReceipt(selectedOrder.id);
-                                                        setConfirmModalOpen(true);
-                                                        setActiveMenuId(null);
-                                                    }}
-                                                    className={`w-full px-4 py-3 rounded-lg text-left flex items-center gap-3 transition-colors ${
-                                                        isDark ? 'hover:bg-purple-500/10 text-purple-400' : 'hover:bg-purple-50 text-purple-700'
-                                                    }`}
-                                                >
-                                                    <PackagePlus size={18} />
-                                                    <div className="flex-1">
-                                                        <div className="font-bold text-sm">Erstellen</div>
-                                                        <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Wareneingang vorerfassen</div>
-                                                    </div>
-                                                </button>
-                                            )}
-                                            
                                             {/* Bearbeiten - Edit */}
                                             {!selectedOrder.isArchived && !isOrderComplete(selectedOrder) && selectedOrder.status !== 'Storniert' && (
                                                 <button
@@ -1169,22 +1124,7 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
         document.body
       )}
 
-      {confirmModalOpen && createPortal(
-        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={handleCancelQuickReceipt} />
-            <div className={`relative w-full max-w-sm rounded-2xl shadow-2xl p-6 flex flex-col gap-4 animate-in zoom-in-95 duration-200 ${isDark ? 'bg-slate-900 border border-slate-700' : 'bg-white'}`}>
-                <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-full shrink-0 ${isDark ? 'bg-purple-500/20 text-purple-400' : 'bg-purple-100 text-purple-600'}`}><PackagePlus size={24} /></div>
-                    <div><h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Wareneingang erstellen?</h3><p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Status wird auf 'Wartet auf Lieferung' gesetzt.</p></div>
-                </div>
-                <div className="flex justify-end gap-3 mt-2">
-                    <button onClick={handleCancelQuickReceipt} className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${isDark ? 'hover:bg-slate-800 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>Abbrechen</button>
-                    <button onClick={handleConfirmQuickReceipt} className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-purple-500/20 transition-all">Ja, erstellen</button>
-                </div>
-            </div>
-        </div>,
-        document.body
-      )}
+      
     </div>
   );
 };

@@ -8,6 +8,7 @@ import {
   StockItem, ReceiptHeader, ReceiptItem, ReceiptComment, ViewMode, Theme, 
   ActiveModule, PurchaseOrder, ReceiptMaster, Ticket, DeliveryLog, StockLog, ReceiptMasterStatus, AuditEntry 
 } from './types';
+import { getDeliveryDateBadge } from './components/ReceiptStatusConfig';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard'; 
@@ -388,14 +389,64 @@ export default function App() {
   const handleCreateOrder = (order: PurchaseOrder) => {
     const exists = purchaseOrders.some(o => o.id === order.id);
     addAudit(exists ? 'Order Updated' : 'Order Created', { po: order.id, supplier: order.supplier, itemCount: order.items.length, status: order.status });
+
+    // --- AUTO-CREATE RECEIPT on NEW order ---
+    if (!exists) {
+      const batchId = `b-${Date.now()}`;
+      const timestamp = Date.now();
+      const poId = order.id;
+
+      // Compute date-aware status
+      const dateBadge = getDeliveryDateBadge(order.expectedDeliveryDate, 'Offen');
+      const receiptStatus: string = dateBadge || 'Wartet auf Lieferung';
+
+      const newHeader: ReceiptHeader = {
+        batchId,
+        lieferscheinNr: 'Ausstehend',
+        bestellNr: poId,
+        lieferdatum: new Date().toISOString().split('T')[0],
+        lieferant: order.supplier,
+        status: receiptStatus,
+        timestamp,
+        itemCount: 0,
+        warehouseLocation: 'Wareneingang',
+        createdByName: 'Admin User'
+      };
+      setReceiptHeaders(prev => [newHeader, ...prev]);
+
+      const initialDelivery: DeliveryLog = {
+        id: crypto.randomUUID(),
+        date: new Date().toISOString(),
+        lieferscheinNr: 'Ausstehend',
+        items: order.items.filter(i => !i.isDeleted).map(i => ({
+          sku: i.sku,
+          receivedQty: 0,
+          quantityAccepted: 0,
+          quantityRejected: 0,
+          damageFlag: false,
+          manualAddFlag: false,
+          orderedQty: i.quantityExpected,
+          previousReceived: 0,
+          offen: i.quantityExpected,
+          zuViel: 0
+        }))
+      };
+
+      setReceiptMasters(prev => [...prev, {
+        id: `RM-${Date.now()}`,
+        poId,
+        status: receiptStatus as ReceiptMasterStatus,
+        deliveries: [initialDelivery]
+      }]);
+
+      // Link receipt to PO
+      order = { ...order, linkedReceiptId: batchId };
+    }
+
     setPurchaseOrders(prev => {
-        // Upsert Logic: Check if ID exists
         if (exists) {
-            // Update existing record
             return prev.map(o => o.id === order.id ? order : o);
         }
-        
-        // Insert new record
         return [order, ...prev];
     });
   };
@@ -431,68 +482,6 @@ export default function App() {
     setSelectedPoId(poId);
     setGoodsReceiptMode(mode);
     handleNavigation('goods-receipt');
-  };
-
-  const handleQuickReceipt = (poId: string) => {
-    const po = purchaseOrders.find(p => p.id === poId);
-    if (!po) return;
-    addAudit('Quick Receipt Created', { po: poId, supplier: po.supplier, itemCount: po.items.length });
-
-    const batchId = `b-${Date.now()}`;
-    const timestamp = Date.now();
-
-    const newHeader: ReceiptHeader = {
-      batchId,
-      lieferscheinNr: 'Ausstehend',
-      bestellNr: po.id,
-      lieferdatum: new Date().toISOString().split('T')[0],
-      lieferant: po.supplier,
-      status: 'Wartet auf Lieferung',
-      timestamp,
-      itemCount: 0,
-      warehouseLocation: 'Wareneingang',
-      createdByName: 'Admin User'
-    };
-
-    setReceiptHeaders(prev => [newHeader, ...prev]);
-
-    setReceiptMasters(prev => {
-        const existing = prev.find(m => m.poId === poId);
-        const initialDelivery: DeliveryLog = {
-            id: crypto.randomUUID(),
-            date: new Date().toISOString(),
-            lieferscheinNr: 'Ausstehend',
-            items: po.items.map(i => ({
-                sku: i.sku,
-                receivedQty: 0,
-                quantityAccepted: 0,
-                quantityRejected: 0,
-                damageFlag: false,
-                manualAddFlag: false,
-                orderedQty: i.quantityExpected,
-                previousReceived: 0,
-                offen: i.quantityExpected,
-                zuViel: 0
-            }))
-        };
-
-        if (existing) {
-            return prev.map(m => m.poId === poId ? { 
-                ...m, 
-                deliveries: [...m.deliveries, initialDelivery] 
-            } : m);
-        } else {
-            return [...prev, {
-                id: `RM-${Date.now()}`,
-                poId,
-                status: 'Wartet auf Lieferung' as ReceiptMasterStatus, 
-                deliveries: [initialDelivery]
-            }];
-        }
-    });
-
-    setPurchaseOrders(prev => prev.map(p => p.id === poId ? { ...p, linkedReceiptId: batchId } : p));
-    handleNavigation('receipt-management');
   };
 
   const handleReceiptSuccess = (
@@ -1324,7 +1313,6 @@ export default function App() {
                      onArchive={handleArchiveOrder}
                      onEdit={handleEditOrder}
                      onReceiveGoods={handleReceiveGoods}
-                     onQuickReceipt={handleQuickReceipt}
                      onCancelOrder={handleCancelOrder}
                      onUpdateOrder={handleUpdateOrder}
                      receiptMasters={receiptMasters}
