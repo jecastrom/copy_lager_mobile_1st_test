@@ -260,10 +260,7 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
             if (activeMenuId) setActiveMenuId(null);
-            else if (confirmModalOpen) {
-                setConfirmModalOpen(false);
-                setSelectedOrderForReceipt(null);
-            } else if (selectedOrder) {
+            else if (selectedOrder) {
                 if (isEditingLink) {
                     setIsEditingLink(false);
                 } else {
@@ -272,9 +269,9 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
             }
         }
     };
-    if (selectedOrder || confirmModalOpen || activeMenuId) window.addEventListener('keydown', handleKeyDown);
+    if (selectedOrder || activeMenuId) window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedOrder, confirmModalOpen, isEditingLink, activeMenuId]);
+  }, [selectedOrder, isEditingLink, activeMenuId]);
 
   // Close menu on any outside click (no backdrop div needed)
   useEffect(() => {
