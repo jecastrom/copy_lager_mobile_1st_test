@@ -243,6 +243,69 @@ export const RECEIPT_STATUS_CONFIG: Record<ReceiptMasterStatus, StatusConfig> = 
         badge: 'bg-orange-500/10 text-orange-400 border-orange-500/20'
       }
     }
+  },
+
+  'Lieferung morgen': {
+    key: 'lieferung-morgen',
+    displayName: 'Lieferung morgen',
+    description: 'Die Lieferung wird für morgen erwartet.',
+    icon: Truck,
+    colorClass: {
+      light: {
+        bg: 'bg-emerald-50',
+        text: 'text-emerald-700',
+        border: 'border-emerald-200',
+        badge: 'bg-emerald-50 text-emerald-600 border-emerald-200'
+      },
+      dark: {
+        bg: 'bg-emerald-500/10',
+        text: 'text-emerald-400',
+        border: 'border-emerald-500/20',
+        badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+      }
+    }
+  },
+
+  'Lieferung heute': {
+    key: 'lieferung-heute',
+    displayName: 'Lieferung heute',
+    description: 'Die Lieferung wird heute erwartet.',
+    icon: Truck,
+    colorClass: {
+      light: {
+        bg: 'bg-amber-50',
+        text: 'text-amber-700',
+        border: 'border-amber-200',
+        badge: 'bg-amber-50 text-amber-600 border-amber-200'
+      },
+      dark: {
+        bg: 'bg-amber-500/10',
+        text: 'text-amber-400',
+        border: 'border-amber-500/20',
+        badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+      }
+    }
+  },
+
+  'Verspätet': {
+    key: 'verspätet',
+    displayName: 'Verspätet',
+    description: 'Die erwartete Lieferung ist überfällig.',
+    icon: AlertCircle,
+    colorClass: {
+      light: {
+        bg: 'bg-red-50',
+        text: 'text-red-700',
+        border: 'border-red-200',
+        badge: 'bg-red-50 text-red-600 border-red-200'
+      },
+      dark: {
+        bg: 'bg-red-500/10',
+        text: 'text-red-400',
+        border: 'border-red-500/20',
+        badge: 'bg-red-500/10 text-red-400 border-red-500/20'
+      }
+    }
   }
 };
 
@@ -277,6 +340,9 @@ export function getStatusConfig(status: string | undefined): StatusConfig | null
   if (normalized.includes('übermenge') || normalized === 'zu viel') return RECEIPT_STATUS_CONFIG['Übermenge'];
   if (normalized.includes('gebucht') || normalized === 'abgeschlossen' || normalized === 'in bearbeitung') return RECEIPT_STATUS_CONFIG['Gebucht'];
   if (normalized === 'offen') return RECEIPT_STATUS_CONFIG['Offen'];
+  if (normalized.includes('morgen')) return RECEIPT_STATUS_CONFIG['Lieferung morgen'];
+  if (normalized.includes('heute')) return RECEIPT_STATUS_CONFIG['Lieferung heute'];
+  if (normalized.includes('verspätet') || normalized.includes('überfällig')) return RECEIPT_STATUS_CONFIG['Verspätet'];
   
   return null;
 }

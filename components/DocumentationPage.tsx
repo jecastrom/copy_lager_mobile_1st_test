@@ -545,6 +545,9 @@ export const DocumentationPage: React.FC<DocumentationPageProps> = ({ theme, onB
               <p className="text-xs">{t('Zeigt Qualitätsprobleme aus dem ReceiptMaster-Status.', 'Shows quality issues from the ReceiptMaster status.')}</p>
               <div className="flex flex-wrap gap-2">
                 <StatusPill label="WARTET AUF LIEFERUNG" color={isDark ? 'bg-[#6264A7]/20 text-[#9ea0e6] border-[#6264A7]/40' : 'bg-[#6264A7]/10 text-[#6264A7] border-[#6264A7]/20'} />
+                <StatusPill label="LIEFERUNG MORGEN" color={isDark ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200'} />
+                <StatusPill label="LIEFERUNG HEUTE" color={isDark ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-amber-50 text-amber-600 border-amber-200'} />
+                <StatusPill label="VERSPÄTET" color={isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-600 border-red-200'} />
                 <StatusPill label="SCHADEN" color={isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-600 border-red-200'} />
                 <StatusPill label="FALSCH" color={isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-600 border-red-200'} />
                 <StatusPill label="ABGELEHNT" color={isDark ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-600 border-red-200'} />
@@ -563,6 +566,9 @@ export const DocumentationPage: React.FC<DocumentationPageProps> = ({ theme, onB
                 <div><strong>Falsch geliefert:</strong> {t('Falsche Artikel erhalten', 'Wrong items received')}</div>
                 <div><strong>Schaden + Falsch:</strong> {t('Kombination aus beiden', 'Combination of both')}</div>
                 <div><strong>Wartet auf Lieferung:</strong> {t('Bestellung offen, wartet auf Wareneingang', 'Order open, waiting for goods receipt')}</div>
+                <div><strong>Lieferung morgen:</strong> {t('Lieferung wird morgen erwartet', 'Delivery expected tomorrow')}</div>
+                <div><strong>Lieferung heute:</strong> {t('Lieferung wird heute erwartet', 'Delivery expected today')}</div>
+                <div><strong>Verspätet:</strong> {t('Erwartete Lieferung ist überfällig', 'Expected delivery is overdue')}</div>
                 <div><strong>Abgeschlossen:</strong> {t('Manuell abgeschlossen (Force Close)', 'Manually closed (Force Close)')}</div>
               </div>
             </div>
