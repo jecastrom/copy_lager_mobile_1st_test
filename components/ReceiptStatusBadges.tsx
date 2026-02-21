@@ -1,7 +1,7 @@
 import React from 'react';
 import { Briefcase, Box, Ticket as TicketIcon } from 'lucide-react';
 import { Theme, ReceiptHeader, ReceiptMaster, PurchaseOrder, Ticket } from '../types';
-import { getStatusConfig } from './ReceiptStatusConfig';
+import { getStatusConfig, getDeliveryDateBadge } from './ReceiptStatusConfig';
 
 interface ReceiptStatusBadgesProps {
   header: ReceiptHeader;
