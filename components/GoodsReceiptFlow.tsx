@@ -1343,20 +1343,30 @@ export const GoodsReceiptFlow: React.FC<GoodsReceiptFlowProps> = ({
                   const lc = getLineCalc(line);
                   const sc = forceClose ? 'gray' : getAutoStatusIcon(line);
                   return (
-                    <div key={i} className="px-4 py-3 flex items-center gap-3">
-                      <StatusDot color={sc} />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-sm truncate">{line.item.name}</div>
-                        <div className="text-[10px] opacity-50 font-mono">{line.item.sku}</div>
-                        {line.item.system && <div className="text-[10px] opacity-40 mt-0.5">System: {line.item.system}</div>}
+                    <div key={i}>
+                      <div className="px-4 py-3 flex items-center gap-3">
+                        <StatusDot color={sc} />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-sm truncate">{line.item.name}</div>
+                          <div className="text-[10px] opacity-50 font-mono">{line.item.sku}</div>
+                          {line.item.system && <div className="text-[10px] opacity-40 mt-0.5">System: {line.item.system}</div>}
+                        </div>
+                        <div className="text-right text-xs space-y-0.5 shrink-0">
+                          {linkedPoId && <div className="opacity-50">Bestellt: {lc.bestellt}</div>}
+                          <div className="font-bold">Heute: +{lc.heute}</div>
+                          {lc.offen > 0 && <div className="text-amber-500 font-bold">Offen: {lc.offen}</div>}
+                          {lc.zuViel > 0 && <div className="text-orange-500 font-bold">Zu viel: +{lc.zuViel}</div>}
+                          {line.qtyRejected > 0 && <div className="text-red-500">Zurück: −{line.qtyRejected}</div>}
+                        </div>
                       </div>
-                      <div className="text-right text-xs space-y-0.5 shrink-0">
-                        {linkedPoId && <div className="opacity-50">Bestellt: {lc.bestellt}</div>}
-                        <div className="font-bold">Heute: +{lc.heute}</div>
-                        {lc.offen > 0 && <div className="text-amber-500 font-bold">Offen: {lc.offen}</div>}
-                        {lc.zuViel > 0 && <div className="text-orange-500 font-bold">Zu viel: +{lc.zuViel}</div>}
-                        {line.qtyRejected > 0 && <div className="text-red-500">Zurück: −{line.qtyRejected}</div>}
-                      </div>
+                      {line.rejectionNotes && (
+                        <div className="px-4 pb-3">
+                          <div className={`text-xs px-3 py-2 rounded-lg flex items-start gap-2 ${isDark ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+                            <AlertTriangle size={12} className="shrink-0 mt-0.5" />
+                            <span>{line.rejectionNotes}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
