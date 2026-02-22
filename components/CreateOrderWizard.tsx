@@ -69,7 +69,7 @@ const PlusMinusPicker = ({ value, onChange, min = 1, max = 9999, disabled = fals
 const cleanSku = (sku: string) => sku.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 const parsePOText = (text: string, inventory: StockItem[]) => {
   const lines = text.split('\n');
-  let orderId = '', orderDate = '', supplier = '';
+  let orderId = '', orderDate = '', supplier = '', expectedDeliveryDate = '';
   const parsedItems: CartItem[] = [];
   const skuMap = new Map<string, StockItem>();
   const supplierHintMap = new Map<string, string>();
@@ -90,7 +90,57 @@ const parsePOText = (text: string, inventory: StockItem[]) => {
       if (!supplier && found.manufacturer) supplier = found.manufacturer;
     }
   });
-  return { orderId, orderDate: orderDate || new Date().toISOString().split('T')[0], supplier: supplier || '', items: parsedItems };
+  // Parse expected delivery date (Liefertermin, Lieferdatum, Delivery, ETA)
+  lines.forEach(line => {
+    if (expectedDeliveryDate) return;
+    const deliveryHint = /(?:Liefertermin|Lieferdatum|Delivery|ETA|Erwartet|Expected)\s*[:.]?\s*(\d{1,2})\.(\d{1,2})\.(\d{2,4})/i;
+    const dm = line.match(deliveryHint);
+    if (dm) {
+      let y = dm[3]; if (y.length === 2) y = '20' + y;
+      expectedDeliveryDate = `${y}-${dm[2].padStart(2, '0')}-${dm[1].padStart(2, '0')}`;
+    }
+  });
+
+  return { orderId, orderDate: orderDate || new Date().toISOString().split('T')[0], supplier: supplier || '', items: parsedItems, expectedDeliveryDate };
+};
+
+// ── Bulk Parser: splits text into PO blocks & parses each ──
+const parseBulkPOText = (text: string, inventory: StockItem[]): ReturnType<typeof parsePOText>[] => {
+  // Split on separator lines (--- / ===), or double blank lines, or PO-header lines
+  const blocks: string[] = [];
+  let current: string[] = [];
+  const lines = text.split('\n');
+  const poHeaderRegex = /^(?:PO|Bestellung|Order|Auftrag)\s*[-#:.\s]/i;
+  const separatorRegex = /^[-=]{3,}\s*$/;
+
+  for (const line of lines) {
+    const isSep = separatorRegex.test(line.trim());
+    const isNewPO = poHeaderRegex.test(line.trim()) && current.some(l => l.trim().length > 0);
+    
+    if (isSep) {
+      if (current.some(l => l.trim())) blocks.push(current.join('\n'));
+      current = [];
+    } else if (isNewPO) {
+      if (current.some(l => l.trim())) blocks.push(current.join('\n'));
+      current = [line];
+    } else {
+      current.push(line);
+    }
+  }
+  if (current.some(l => l.trim())) blocks.push(current.join('\n'));
+
+  // If no splits found, treat whole text as one block
+  if (blocks.length === 0) blocks.push(text);
+
+  // Parse each block
+  const results = blocks.map(block => parsePOText(block, inventory)).filter(r => r.items.length > 0 || r.orderId);
+  
+  // Auto-generate missing IDs
+  results.forEach((r, i) => {
+    if (!r.orderId) r.orderId = `PO-IMP-${Date.now()}-${i + 1}`;
+  });
+
+  return results;
 };
 
 const SUPPLIER_OPTIONS = [
@@ -189,8 +239,34 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
   const reactivateCartItem = (i: number) => setCart(p => p.map((x, idx) => idx === i ? { ...x, isDeleted: false } : x));
 
   const handleParseImport = () => {
-    const r = parsePOText(importText, items);
-    setFormData(p => ({ ...p, orderId: r.orderId || p.orderId, orderDate: r.orderDate || p.orderDate, supplier: r.supplier || p.supplier }));
+    const allParsed = parseBulkPOText(importText, items);
+
+    // BULK MODE: 2+ PO blocks with items → create all silently
+    if (allParsed.length >= 2 && allParsed.filter(r => r.items.length > 0).length >= 2) {
+      let created = 0;
+      allParsed.forEach(r => {
+        if (r.items.length === 0) return;
+        const order: PurchaseOrder = {
+          id: r.orderId || `PO-IMP-${Date.now()}-${created}`,
+          supplier: r.supplier || 'Unbekannt',
+          dateCreated: r.orderDate,
+          expectedDeliveryDate: r.expectedDeliveryDate || '',
+          status: 'Lager',
+          isArchived: false,
+          items: r.items.map(c => ({ sku: c.sku, name: c.name, quantityExpected: c.quantity, quantityReceived: 0 }))
+        };
+        onCreateOrder(order);
+        created++;
+      });
+      alert(`Bulk-Import: ${created} Bestellungen erstellt.`);
+      setShowImportModal(false); setImportText('');
+      onNavigate('order-management');
+      return;
+    }
+
+    // SINGLE MODE: fill wizard (existing behavior)
+    const r = allParsed[0] || parsePOText(importText, items);
+    setFormData(p => ({ ...p, orderId: r.orderId || p.orderId, orderDate: r.orderDate || p.orderDate, supplier: r.supplier || p.supplier, expectedDeliveryDate: r.expectedDeliveryDate || p.expectedDeliveryDate }));
     if (r.items.length > 0) { setCart(r.items); alert(`${r.items.length} Positionen erkannt und importiert.`); } else alert("Keine bekannten Artikel im Text gefunden.");
     setShowImportModal(false); setImportText('');
   };
@@ -248,8 +324,9 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
               <h3 className={`text-lg font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}><Sparkles size={20} className="text-amber-500" /> Smart Import</h3>
               <button onClick={() => { setShowImportModal(false); setImportText(''); }} className={`p-2 rounded-full ${isDark ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}><X size={20} /></button>
             </div>
-            <textarea value={importText} onChange={e => setImportText(e.target.value)} placeholder="Bestelltext hier einfügen…" className={`flex-1 min-h-[200px] p-4 rounded-xl border text-sm resize-none outline-none focus:ring-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white focus:ring-blue-500/30' : 'bg-slate-50 border-slate-200 focus:ring-[#0077B5]/20'}`} autoFocus />
-            <button onClick={handleParseImport} disabled={!importText.trim()} className="mt-4 w-full py-3 bg-[#0077B5] hover:bg-[#00A0DC] text-white rounded-2xl font-bold disabled:opacity-50 flex items-center justify-center gap-2 transition-all"><Download size={18} /> Importieren</button>
+            <textarea value={importText} onChange={e => setImportText(e.target.value)} placeholder={"Bestelltext hier einfügen…\n\nEinzel-Import: Text einer Bestellung einfügen.\nBulk-Import: Mehrere Bestellungen mit --- trennen.\n\nBeispiel:\nBestellung Nr. PO-001\nLieferant: Battery Kutter\nLiefertermin: 25.03.2026\n4000069 10x\n2030855 4 stk\n---\nBestellung Nr. PO-002\nLieferant: Würth\n…"} className={`flex-1 min-h-[200px] p-4 rounded-xl border text-sm resize-none outline-none focus:ring-2 ${isDark ? 'bg-slate-800 border-slate-700 text-white focus:ring-blue-500/30' : 'bg-slate-50 border-slate-200 focus:ring-[#0077B5]/20'}`} autoFocus />
+            <p className={`mt-2 text-[11px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Einzelne Bestellung → füllt den Wizard. Mehrere Blöcke (getrennt mit ---) → Bulk-Erstellung.</p>
+            <button onClick={handleParseImport} disabled={!importText.trim()} className="mt-3 w-full py-3 bg-[#0077B5] hover:bg-[#00A0DC] text-white rounded-2xl font-bold disabled:opacity-50 flex items-center justify-center gap-2 transition-all"><Download size={18} /> Importieren</button>
           </div>
         </div>, document.body
       )}

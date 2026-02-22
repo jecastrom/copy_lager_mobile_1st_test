@@ -147,58 +147,7 @@ export const MOCK_COMMENTS: ReceiptComment[] = [
 // PROCESS-DRIVEN WORKFLOW MOCK DATA (PHASE 1)
 // ------------------------------------------------------------------
 
-export const MOCK_PURCHASE_ORDERS: PurchaseOrder[] = [
-    {
-        id: 'PO-2026-BK01',
-        supplier: 'Battery Kutter',
-        status: 'Offen',
-        dateCreated: '2026-02-25',
-        expectedDeliveryDate: '2026-03-05',
-        isArchived: false,
-        items: [
-            {
-                sku: '4000069',
-                name: 'Polkappe für Bleiakku M5/M6 Rot',
-                quantityExpected: 10,
-                quantityReceived: 0
-            },
-            {
-                sku: '2030855',
-                name: 'SB12-45V0',
-                quantityExpected: 4,
-                quantityReceived: 0
-            },
-            {
-                sku: '2037507',
-                name: 'SB12-2.3V0',
-                quantityExpected: 10,
-                quantityReceived: 0
-            }
-        ]
-    },
-    {
-        id: 'PO-2026-WU02',
-        supplier: 'Würth',
-        status: 'Offen',
-        dateCreated: '2026-02-20',
-        expectedDeliveryDate: '2026-03-01',
-        isArchived: false,
-        items: [
-            {
-                sku: 'UnBEKANNT', // Matches inventory case exactly
-                name: 'Brandmeldeleitung JY-(st)Y ',
-                quantityExpected: 50,
-                quantityReceived: 0
-            },
-            {
-                sku: 'Unbekannt', // Matches inventory case exactly
-                name: 'Transport Box Batterien Rot',
-                quantityExpected: 5,
-                quantityReceived: 0
-            }
-        ]
-    }
-];
+export const MOCK_PURCHASE_ORDERS: PurchaseOrder[] = [];
 
 export const MOCK_RECEIPT_MASTERS: ReceiptMaster[] = [];
 
