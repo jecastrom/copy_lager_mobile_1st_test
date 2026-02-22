@@ -1247,8 +1247,13 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                      onClick={() => handleOpenDetail(row)}
                      className={`p-4 cursor-pointer transition-colors ${row.isArchived ? (isDark ? 'bg-slate-900/50 opacity-60 hover:bg-slate-800/50' : 'bg-slate-50 opacity-60 hover:bg-slate-100') : (isDark ? 'hover:bg-slate-800 active:bg-slate-700' : 'hover:bg-slate-50 active:bg-slate-100')}`}
                    >
-                     <div className="flex items-center gap-2 mb-3 flex-wrap">
-                       <ReceiptStatusBadges header={row} master={linkedMaster} linkedPO={linkedPO} tickets={rowTickets} theme={theme} />
+                     <div className="flex items-start gap-3 mb-3">
+                       <div className="flex-1 min-w-0 [&_.status-pill-stack]:flex [&_.status-pill-stack]:flex-col [&_.status-pill-stack]:gap-1.5 [&_.status-pill-stack>span]:w-full [&_.status-pill-stack>span]:justify-center [&_.status-pill-stack>span]:text-center">
+                         <ReceiptStatusBadges header={row} master={linkedMaster} linkedPO={linkedPO} tickets={rowTickets} theme={theme} />
+                       </div>
+                       <div className="shrink-0 pt-0.5" onClick={(e) => e.stopPropagation()}>
+                         {renderActions(inspectionState, linkedPO, row, linkedMaster, `mob-${row.batchId}`)}
+                       </div>
                      </div>
                      <div className="space-y-2 mb-3">
                        <div className="flex items-center justify-between">
@@ -1281,11 +1286,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
                          </div>
                        )}
                      </div>
-                     {(inspectionState?.canInspect || (row.status && ['Übermenge', 'Zu viel', 'Schaden', 'Beschädigt', 'Falsch geliefert', 'Abgelehnt', 'Sonstiges'].some(s => row.status.includes(s)))) && (
-                       <div className="flex items-center gap-2 pt-3 border-t border-slate-200 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
-                         {renderActions(inspectionState, linkedPO, row, linkedMaster, `mob-${row.batchId}`)}
-                       </div>
-                     )}
+                     
                      <div className="flex justify-end mt-2"><ChevronRight size={18} className="text-slate-400" /></div>
                    </div>
                  );

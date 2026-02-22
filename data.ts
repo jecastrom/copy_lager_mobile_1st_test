@@ -85,63 +85,11 @@ export const MOCK_ITEMS: StockItem[] = FULL_INVENTORY.map((raw, index) => {
   };
 });
 
-export const MOCK_RECEIPT_HEADERS: ReceiptHeader[] = [
-    {
-        batchId: 'b-101',
-        lieferscheinNr: 'LS-2024-001',
-        bestellNr: 'BEST-992',
-        lieferdatum: '2024-05-15',
-        lieferant: 'Battery Kutter',
-        status: 'Gebucht',
-        timestamp: Date.now() - 10000000,
-        itemCount: 2,
-        warehouseLocation: 'Akku Service',
-        createdByName: 'Robert Dallmann'
-    },
-    {
-        batchId: 'b-102',
-        lieferscheinNr: '77766',
-        bestellNr: 'PO-ABUS-22',
-        lieferdatum: '2024-06-20',
-        lieferant: 'ABUS',
-        status: 'Reklamation',
-        timestamp: Date.now() - 20000000,
-        itemCount: 1,
-        warehouseLocation: 'Sicherheitstechnik',
-        createdByName: 'Robert Dallmann'
-    }
-];
+export const MOCK_RECEIPT_HEADERS: ReceiptHeader[] = [];
 
-export const MOCK_RECEIPT_ITEMS: ReceiptItem[] = [
-    {
-        id: 'ri-1',
-        batchId: 'b-101',
-        sku: '4000117',
-        name: 'Polkappe für Bleiakku M6/M8 Schwarz',
-        quantity: 10,
-        targetLocation: 'Akku Service'
-    },
-    {
-        id: 'ri-2',
-        batchId: 'b-101',
-        sku: '4000118',
-        name: 'Polkappe für Bleiakku M6/M8 Rot',
-        quantity: 10,
-        targetLocation: 'Akku Service'
-    }
-];
+export const MOCK_RECEIPT_ITEMS: ReceiptItem[] = [];
 
-export const MOCK_COMMENTS: ReceiptComment[] = [
-    {
-        id: 'c-1',
-        batchId: 'b-101',
-        userId: 'u1',
-        userName: 'System',
-        timestamp: Date.now() - 10000000,
-        type: 'note',
-        message: 'Initialer Import'
-    }
-];
+export const MOCK_COMMENTS: ReceiptComment[] = [];
 
 // ------------------------------------------------------------------
 // PROCESS-DRIVEN WORKFLOW MOCK DATA (PHASE 1)
@@ -155,68 +103,4 @@ export const MOCK_RECEIPT_MASTERS: ReceiptMaster[] = [];
 // CASE MANAGEMENT MOCK DATA (PHASE 4)
 // ------------------------------------------------------------------
 
-export const MOCK_TICKETS: Ticket[] = [
-    {
-        id: 't-1',
-        receiptId: 'b-101', // Linked to LS-2024-001
-        subject: 'Falsche Menge geliefert',
-        status: 'Open',
-        priority: 'Normal',
-        messages: [
-            {
-                id: 'msg-1',
-                author: 'System',
-                text: 'Ticket erstellt am 30.01.2026.',
-                timestamp: Date.now() - 10000000,
-                type: 'system'
-            },
-            {
-                id: 'msg-2',
-                author: 'Admin User',
-                text: 'Es fehlen 2 Akkus aus der Lieferung. Lieferschein sagt 10, Paket enthielt 8.',
-                timestamp: Date.now() - 9000000,
-                type: 'user'
-            }
-        ]
-    },
-    {
-        id: 't-2',
-        receiptId: 'b-102', // Linked to 77766 (ABUS)
-        subject: 'Ware beschädigt',
-        status: 'Closed',
-        priority: 'High',
-        messages: [
-            {
-                id: 'msg-3',
-                author: 'Admin User',
-                text: 'Karton war aufgerissen.',
-                timestamp: Date.now() - 15000000,
-                type: 'user'
-            },
-            {
-                id: 'msg-4',
-                author: 'Robert Dallmann',
-                text: 'Geklärt mit Lieferant. Gutschrift erhalten.',
-                timestamp: Date.now() - 1000000,
-                type: 'user'
-            }
-        ]
-    },
-    // Requested Sample Ticket
-    {
-        id: 't-3',
-        receiptId: 'b-101', 
-        subject: 'Beschädigte Ware',
-        status: 'Open',
-        priority: 'High',
-        messages: [
-            {
-                id: 'msg-new-1',
-                author: 'System',
-                text: 'Ticket automatisch erstellt bei Warenprüfung.',
-                timestamp: Date.now(),
-                type: 'system'
-            }
-        ]
-    }
-];
+export const MOCK_TICKETS: Ticket[] = [];
