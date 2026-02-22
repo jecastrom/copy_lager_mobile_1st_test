@@ -707,8 +707,11 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
     const thisMenuKey = menuKey || 'detail';
     const actions = [];
 
-    // SMART INSPECT BUTTON (Standard / Replacement) - Hidden when manually closed
-    if (inspectionState?.canInspect && po && !po.isForceClosed) {
+    // If PO is cancelled, only show Problem button
+    const isCancelled = po?.status === 'Storniert';
+
+    // SMART INSPECT BUTTON (Standard / Replacement) - Hidden when manually closed or cancelled
+    if (inspectionState?.canInspect && po && !po.isForceClosed && !isCancelled) {
       actions.push({
         key: 'inspect',
         label: inspectionState.label === 'Prüfung fortsetzen' ? 'Prüfen' : 'Nachlieferung',
@@ -719,9 +722,9 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
       });
     }
 
-    // RETURN BUTTON (For ANY Issue or Overdelivery) - Hidden when manually closed
+    // RETURN BUTTON (For ANY Issue or Overdelivery) - Hidden when manually closed or cancelled
     const effectiveReturnStatus = activeMaster?.status || activeHeader?.status || '';
-    if (!po?.isForceClosed && activeHeader && ['Übermenge', 'Zu viel', 'Schaden', 'Beschädigt', 'Falsch geliefert', 'Abgelehnt', 'Sonstiges'].some(s => effectiveReturnStatus.includes(s)) && po) {
+    if (!po?.isForceClosed && !isCancelled && activeHeader && ['Übermenge', 'Zu viel', 'Schaden', 'Beschädigt', 'Falsch geliefert', 'Abgelehnt', 'Sonstiges'].some(s => effectiveReturnStatus.includes(s)) && po) {
       actions.push({
         key: 'return',
         label: 'Rücksendung',
@@ -751,8 +754,8 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
       });
     }
 
-    // CLOSE BUTTON - Hidden when already closed or force closed
-    if (activeHeader && activeHeader.status !== 'Abgeschlossen' && !po?.isForceClosed) {
+    // CLOSE BUTTON - Hidden when already closed, force closed, or cancelled
+    if (activeHeader && activeHeader.status !== 'Abgeschlossen' && activeHeader.status !== 'Storniert' && !po?.isForceClosed && !isCancelled) {
       actions.push({
         key: 'close',
         label: 'Schließen',

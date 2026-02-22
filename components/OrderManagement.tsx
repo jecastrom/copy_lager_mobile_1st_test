@@ -250,6 +250,9 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
   const [tempLink, setTempLink] = useState('');
   const [showCopyToast, setShowCopyToast] = useState(false);
 
+  // -- Cancel Confirmation Modal State --
+  const [cancelConfirmOrderId, setCancelConfirmOrderId] = useState<string | null>(null);
+
   // -- Action Menu State --
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [menuPos, setMenuPos] = useState<{ top: number; right?: number; left?: number }>({ top: 0, right: 0 });
@@ -420,8 +423,16 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
   
 
   const handleCancelOrderClick = (id: string) => {
-      onCancelOrder(id);
+      setCancelConfirmOrderId(id);
       setActiveMenuId(null);
+  };
+
+  const handleConfirmCancel = () => {
+      if (cancelConfirmOrderId) {
+          onCancelOrder(cancelConfirmOrderId);
+          setSelectedOrder(null);
+      }
+      setCancelConfirmOrderId(null);
   };
 
   // --- UI Component: Filter Chip ---
@@ -612,10 +623,6 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                            {!order.isArchived && !isDone && order.status !== 'Storniert' && totalReceived === 0 && (
                              <MenuItem icon={Ban} label="Stornieren" onClick={() => handleCancelOrderClick(order.id)} danger />
                            )}
-
-                           {!order.isArchived && (
-                             <MenuItem icon={Archive} label="Archivieren" onClick={() => handleArchiveClick(order.id)} />
-                           )}
                          </div>
                        </div>
                      </>,
@@ -728,10 +735,6 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
 
                                         {!order.isArchived && !isDone && order.status !== 'Storniert' && totalReceived === 0 && (
                                             <MenuItem icon={Ban} label="Stornieren" onClick={() => handleCancelOrderClick(order.id)} danger />
-                                        )}
-
-                                        {!order.isArchived && (
-                                            <MenuItem icon={Archive} label="Archivieren" onClick={() => handleArchiveClick(order.id)} />
                                         )}
                                     </div>
                                 </div>
@@ -1058,11 +1061,11 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                                                 <div className={`h-px my-1 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`} />
                                             )}
                                             
-                                            {/* Stornieren - Cancel */}
+                                            {/* Stornieren - Cancel (opens confirmation modal) */}
                                             {!selectedOrder.isArchived && !isOrderComplete(selectedOrder) && selectedOrder.status !== 'Storniert' && selectedOrder.items.reduce((s, i) => s + i.quantityReceived, 0) === 0 && (
                                                 <button
                                                     onClick={() => {
-                                                        onCancelOrder(selectedOrder.id);
+                                                        handleCancelOrderClick(selectedOrder.id);
                                                         setActiveMenuId(null);
                                                     }}
                                                     className={`w-full px-4 py-3 rounded-lg text-left flex items-center gap-3 transition-colors ${
@@ -1073,31 +1076,6 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                                                     <div className="flex-1">
                                                         <div className="font-bold text-sm">Stornieren</div>
                                                         <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Bestellung abbrechen</div>
-                                                    </div>
-                                                </button>
-                                            )}
-                                            
-                                            {/* Divider before archive */}
-                                            {!selectedOrder.isArchived && (
-                                                <div className={`h-px my-1 ${isDark ? 'bg-slate-700' : 'bg-slate-200'}`} />
-                                            )}
-                                            
-                                            {/* Archivieren - Archive */}
-                                            {!selectedOrder.isArchived && (
-                                                <button
-                                                    onClick={() => {
-                                                        onArchive(selectedOrder.id);
-                                                        setSelectedOrder(null);
-                                                        setActiveMenuId(null);
-                                                    }}
-                                                    className={`w-full px-4 py-3 rounded-lg text-left flex items-center gap-3 transition-colors ${
-                                                        isDark ? 'hover:bg-amber-500/10 text-amber-400' : 'hover:bg-amber-50 text-amber-700'
-                                                    }`}
-                                                >
-                                                    <Archive size={18} />
-                                                    <div className="flex-1">
-                                                        <div className="font-bold text-sm">Archivieren</div>
-                                                        <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>In Archiv verschieben</div>
                                                     </div>
                                                 </button>
                                             )}
@@ -1121,7 +1099,34 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
         document.body
       )}
 
-      
+      {/* CANCEL CONFIRMATION MODAL */}
+      {cancelConfirmOrderId && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" onClick={() => setCancelConfirmOrderId(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className={`relative w-full max-w-md rounded-2xl border p-6 space-y-4 shadow-2xl ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3">
+              <div className={`p-3 rounded-xl ${isDark ? 'bg-red-500/20' : 'bg-red-50'}`}>
+                <Ban size={24} className="text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">Bestellung stornieren?</h3>
+                <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Diese Aktion ist endgültig und kann nicht rückgängig gemacht werden.</p>
+              </div>
+            </div>
+            <div className={`p-3 rounded-lg text-sm space-y-1 ${isDark ? 'bg-red-500/10 border border-red-500/20 text-slate-300' : 'bg-red-50 border border-red-200 text-slate-600'}`}>
+              <p>• Die Bestellung wird <strong>unwiderruflich storniert</strong></p>
+              <p>• Der verknüpfte Wareneingang wird ebenfalls <strong>geschlossen</strong></p>
+              <p>• Alle offenen Tickets werden <strong>automatisch geschlossen</strong></p>
+              <p>• Bestellung und Wareneingang werden <strong>automatisch archiviert</strong></p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => setCancelConfirmOrderId(null)} className={`flex-1 px-4 py-3 rounded-xl font-bold ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`}>Offen lassen</button>
+              <button onClick={handleConfirmCancel} className="flex-1 px-4 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-500">Ja, stornieren</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

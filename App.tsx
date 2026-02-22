@@ -499,18 +499,28 @@ export default function App() {
 
   const handleCancelOrder = (id: string) => {
     addAudit('Order Cancelled', { po: id });
+
+    // 1. Cancel + auto-archive PO
     setPurchaseOrders(prev => prev.map(o => {
       if (o.id === id) {
-        return { ...o, status: 'Storniert' }; 
+        return { ...o, status: 'Storniert', isArchived: true }; 
       }
       return o;
     }));
 
-    // CASCADE: Set linked receipt to Storniert + archived
+    // 2. CASCADE: Set linked receipt to Storniert
     setReceiptMasters(prev => prev.map(m => m.poId === id ? { ...m, status: 'Abgeschlossen' as ReceiptMasterStatus } : m));
     setReceiptHeaders(prev => prev.map(h => h.bestellNr === id ? { ...h, status: 'Storniert' } : h));
 
-    // CASCADE: Close all linked tickets
+    // 3. CASCADE: Auto-archive receipt
+    setArchivedReceiptGroups(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem('archivedReceiptGroups', JSON.stringify([...next]));
+      return next;
+    });
+
+    // 4. CASCADE: Close all linked tickets
     const linkedBatchIds = receiptHeaders.filter(h => h.bestellNr === id).map(h => h.batchId);
     if (linkedBatchIds.length > 0) {
       setTickets(prev => prev.map(t => {
