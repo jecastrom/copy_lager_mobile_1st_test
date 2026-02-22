@@ -255,7 +255,7 @@ const PlusMinusPicker = ({ value, onChange, min = 0, max = 999, disabled = false
       <button 
         onClick={dec} 
         disabled={disabled || value <= min}
-        className={`min-w-[48px] min-h-[48px] flex items-center justify-center rounded-lg font-bold text-white text-2xl active:scale-95 transition-all ${
+        className={`min-w-[48px] min-h-[48px] md:min-w-[36px] md:min-h-[36px] flex items-center justify-center rounded-lg font-bold text-white text-2xl md:text-lg active:scale-95 transition-all ${
           disabled || value <= min 
             ? 'bg-gray-400 cursor-not-allowed' 
             : 'bg-red-600 hover:bg-red-500 active:bg-red-700'
@@ -276,7 +276,7 @@ const PlusMinusPicker = ({ value, onChange, min = 0, max = 999, disabled = false
             onChange={e => setTempValue(e.target.value)}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            className={`w-20 h-12 text-center text-2xl font-bold font-mono rounded-lg border-2 ${
+            className={`w-20 h-12 md:w-14 md:h-9 text-center text-2xl md:text-base font-bold font-mono rounded-lg border-2 ${
               isDark 
                 ? 'bg-slate-900 border-blue-500 text-white' 
                 : 'bg-white border-blue-500 text-slate-900'
@@ -287,7 +287,7 @@ const PlusMinusPicker = ({ value, onChange, min = 0, max = 999, disabled = false
           <button
             onClick={handleNumberClick}
             disabled={disabled}
-            className={`w-20 h-12 flex items-center justify-center text-2xl font-bold font-mono rounded-lg border-2 transition-all ${
+            className={`w-20 h-12 md:w-14 md:h-9 flex items-center justify-center text-2xl md:text-base font-bold font-mono rounded-lg border-2 transition-all ${
               isDark 
                 ? 'bg-slate-900 border-slate-600 text-white hover:border-slate-500' 
                 : 'bg-white border-slate-300 text-slate-900 hover:border-slate-400'
@@ -302,7 +302,7 @@ const PlusMinusPicker = ({ value, onChange, min = 0, max = 999, disabled = false
       <button 
         onClick={inc} 
         disabled={disabled || value >= max}
-        className={`min-w-[48px] min-h-[48px] flex items-center justify-center rounded-lg font-bold text-white text-2xl active:scale-95 transition-all ${
+        className={`min-w-[48px] min-h-[48px] md:min-w-[36px] md:min-h-[36px] flex items-center justify-center rounded-lg font-bold text-white text-2xl md:text-lg active:scale-95 transition-all ${
           disabled || value >= max 
             ? 'bg-gray-400 cursor-not-allowed' 
             : 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700'
@@ -1152,9 +1152,9 @@ export const GoodsReceiptFlow: React.FC<GoodsReceiptFlowProps> = ({
                   {/* Desktop Table View */}
                   <div className="hidden md:block">
                     <div className={`rounded-xl border overflow-hidden ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
-                      <div className="overflow-x-auto">
+                      <div className="overflow-x-auto max-h-[calc(100vh-340px)] overflow-y-auto">
                         <table className="w-full">
-                          <thead className={`text-xs uppercase tracking-wider ${isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-50 text-slate-500'}`}>
+                          <thead className={`text-xs uppercase tracking-wider sticky top-0 z-10 ${isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-50 text-slate-500'}`}>
                             <tr>
                               <th className="px-4 py-3 text-left font-bold">Artikel</th>
                               {linkedPoId && <th className="px-4 py-3 text-center font-bold">Bestellt</th>}
@@ -1178,6 +1178,7 @@ export const GoodsReceiptFlow: React.FC<GoodsReceiptFlowProps> = ({
                                   <td className="px-4 py-3">
                                     <div className="font-bold text-sm">{cartLine.item.name}</div>
                                     <div className="text-[10px] font-mono opacity-50">{cartLine.item.sku}</div>
+                                    {cartLine.item.system && <div className="text-[10px] opacity-40">System: {cartLine.item.system}</div>}
                                   </td>
                                   {linkedPoId && <td className="px-4 py-3 text-center font-mono text-sm">{calc.bestellt}</td>}
                                   {linkedPoId && <td className="px-4 py-3 text-center font-mono text-sm opacity-60">{calc.bisHeute}</td>}
