@@ -371,13 +371,18 @@ export function getDeliveryDateBadge(
   const expected = new Date(expectedDeliveryDate);
   expected.setHours(0, 0, 0, 0);
 
-  if (expected.getTime() === today.getTime()) return 'Lieferung heute';
-  if (expected.getTime() === tomorrow.getTime()) return 'Lieferung morgen';
+  const lower = (currentStatus || '').toLowerCase();
+
+  // Pre-receipt = no actual goods received yet
+  const isPreReceipt = !currentStatus || lower === 'offen' || lower.includes('wartet') || lower.includes('lieferung morgen') || lower.includes('lieferung heute') || lower.includes('verspätet');
+
+  // Lieferung heute/morgen: ONLY for pre-receipt (suppress after partial/full delivery)
+  if (expected.getTime() === today.getTime() && isPreReceipt) return 'Lieferung heute';
+  if (expected.getTime() === tomorrow.getTime() && isPreReceipt) return 'Lieferung morgen';
 
   if (expected.getTime() < today.getTime()) {
-    // Only show Verspätet for open/partial/waiting statuses
-    const lower = (currentStatus || '').toLowerCase();
-    const isOpenish = !currentStatus || lower === 'offen' || lower.includes('teil') || lower.includes('wartet');
+    // Verspätet: show for pre-receipt AND partial delivery
+    const isOpenish = isPreReceipt || lower.includes('teil');
     if (isOpenish) return 'Verspätet';
   }
 

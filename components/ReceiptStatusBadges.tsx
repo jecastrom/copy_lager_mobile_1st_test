@@ -103,7 +103,9 @@ export const ReceiptStatusBadges: React.FC<ReceiptStatusBadgesProps> = ({
   }
 
   // --- BADGE 3: DELIVERY TIMING (COMPUTED FROM DATE) ---
-  const deliveryBadge = getDeliveryDateBadge(linkedPO?.expectedDeliveryDate, effectiveStatus);
+  // Skip if Badge 2 already shows a delivery-date status (avoid duplicate pill)
+  const isAlreadyDeliveryStatus = ['Lieferung morgen', 'Lieferung heute', 'Verspätet'].includes(effectiveStatus);
+  const deliveryBadge = isAlreadyDeliveryStatus ? null : getDeliveryDateBadge(linkedPO?.expectedDeliveryDate, effectiveStatus);
   if (deliveryBadge) {
     const dConfig = getStatusConfig(deliveryBadge);
     if (dConfig) {
