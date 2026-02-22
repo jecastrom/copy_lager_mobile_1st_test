@@ -931,7 +931,7 @@ export const GoodsReceiptFlow: React.FC<GoodsReceiptFlowProps> = ({
               </div>
               <div>
                 <label className={`${labelClass} mb-2 block`}>Lieferdatum</label>
-                <input type="date" value={headerData.lieferdatum} onChange={e => setHeaderData(prev => ({...prev, lieferdatum: e.target.value}))} className={inputClass} />
+                <input type="date" value={headerData.lieferdatum} onChange={e => setHeaderData(prev => ({...prev, lieferdatum: e.target.value}))} className={`${inputClass} appearance-none max-w-full`} style={{ WebkitAppearance: 'none' }} />
               </div>
             </div>
 
