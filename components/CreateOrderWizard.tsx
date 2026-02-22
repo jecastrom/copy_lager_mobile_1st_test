@@ -69,7 +69,7 @@ const PlusMinusPicker = ({ value, onChange, min = 1, max = 9999, disabled = fals
 const cleanSku = (sku: string) => sku.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 const parsePOText = (text: string, inventory: StockItem[]) => {
   const lines = text.split('\n');
-  let orderId = '', orderDate = '', supplier = '', expectedDeliveryDate = '';
+  let orderId = '', orderDate = '', supplier = '', expectedDeliveryDate = '', poType: 'normal' | 'project' = 'normal';
   const parsedItems: CartItem[] = [];
   const skuMap = new Map<string, StockItem>();
   const supplierHintMap = new Map<string, string>();
@@ -90,6 +90,19 @@ const parsePOText = (text: string, inventory: StockItem[]) => {
       if (!supplier && found.manufacturer) supplier = found.manufacturer;
     }
   });
+  // Parse PO type (Art/Type: Projekt/Project → project, else normal/Lager)
+  lines.forEach(line => {
+    if (poType !== 'normal') return;
+    const typeHint = /(?:Art|Type|Typ)\s*[:.]?\s*(Projekt|Project|Lager|Stock|Normal)/i;
+    const tm = line.match(typeHint);
+    if (tm) {
+      const val = tm[1].toLowerCase();
+      poType = (val === 'projekt' || val === 'project') ? 'project' : 'normal';
+    }
+    // Also detect standalone keyword on a line
+    if (/^\s*Projekt\s*$/i.test(line.trim())) poType = 'project';
+  });
+
   // Parse expected delivery date (Liefertermin, Lieferdatum, Delivery, ETA)
   lines.forEach(line => {
     if (expectedDeliveryDate) return;
@@ -101,7 +114,7 @@ const parsePOText = (text: string, inventory: StockItem[]) => {
     }
   });
 
-  return { orderId, orderDate: orderDate || new Date().toISOString().split('T')[0], supplier: supplier || '', items: parsedItems, expectedDeliveryDate };
+  return { orderId, orderDate: orderDate || new Date().toISOString().split('T')[0], supplier: supplier || '', items: parsedItems, expectedDeliveryDate, poType };
 };
 
 // ── Bulk Parser: splits text into PO blocks & parses each ──
@@ -251,7 +264,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
           supplier: r.supplier || 'Unbekannt',
           dateCreated: r.orderDate,
           expectedDeliveryDate: r.expectedDeliveryDate || '',
-          status: 'Lager',
+          status: r.poType === 'project' ? 'Projekt' : 'Lager',
           isArchived: false,
           items: r.items.map(c => ({ sku: c.sku, name: c.name, quantityExpected: c.quantity, quantityReceived: 0 }))
         };
@@ -266,7 +279,8 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
     // SINGLE MODE: fill wizard (existing behavior)
     const r = allParsed[0] || parsePOText(importText, items);
-    setFormData(p => ({ ...p, orderId: r.orderId || p.orderId, orderDate: r.orderDate || p.orderDate, supplier: r.supplier || p.supplier, expectedDeliveryDate: r.expectedDeliveryDate || p.expectedDeliveryDate }));
+    const parsedType = r.poType === 'project' ? 'project' : r.poType === 'normal' ? 'normal' : null;
+    setFormData(p => ({ ...p, orderId: r.orderId || p.orderId, orderDate: r.orderDate || p.orderDate, supplier: r.supplier || p.supplier, expectedDeliveryDate: r.expectedDeliveryDate || p.expectedDeliveryDate, poType: parsedType || p.poType }));
     if (r.items.length > 0) { setCart(r.items); alert(`${r.items.length} Positionen erkannt und importiert.`); } else alert("Keine bekannten Artikel im Text gefunden.");
     setShowImportModal(false); setImportText('');
   };
