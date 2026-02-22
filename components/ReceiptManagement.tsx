@@ -100,6 +100,18 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
     }
     return new Set();
   });
+
+  // Sync from localStorage on every focus (catches writes from App.tsx cancel/archive cascades)
+  useEffect(() => {
+    const syncFromStorage = () => {
+      const saved = localStorage.getItem('archivedReceiptGroups');
+      if (saved) setArchivedReceiptGroups(new Set(JSON.parse(saved)));
+    };
+    window.addEventListener('focus', syncFromStorage);
+    // Also sync immediately on mount/update from navigation
+    syncFromStorage();
+    return () => window.removeEventListener('focus', syncFromStorage);
+  }, []);
   const [problemConfirmPO, setProblemConfirmPO] = useState<PurchaseOrder | null>(null);
   const [returnPickerPO, setReturnPickerPO] = useState<PurchaseOrder | null>(null);
   // New State: Delivery List Popover
@@ -220,7 +232,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
               deliveryCount: deliveryCount,
               masterStatus: master ? master.status : latest.status,
               subHeaders: groupHeaders,
-              isArchived: archivedReceiptGroups.has(poId)
+              isArchived: archivedReceiptGroups.has(poId) || master?.status === 'Abgeschlossen' && groupHeaders.some(h => h.status === 'Storniert')
           });
       });
 
@@ -230,7 +242,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
               isGroup: false,
               deliveryCount: 1,
               masterStatus: h.status,
-              isArchived: archivedReceiptGroups.has(h.batchId)
+              isArchived: archivedReceiptGroups.has(h.batchId) || h.status === 'Storniert'
           });
       });
 
@@ -710,7 +722,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
     // If PO is cancelled, only show Problem button
     const isCancelled = po?.status === 'Storniert';
 
-    // SMART INSPECT BUTTON (Standard / Replacement) - Hidden when manually closed or cancelled
+    // SMART INSPECT BUTTON (Standard / Replacement) - Hidden when manually closed
     if (inspectionState?.canInspect && po && !po.isForceClosed && !isCancelled) {
       actions.push({
         key: 'inspect',

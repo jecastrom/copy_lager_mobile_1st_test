@@ -474,15 +474,15 @@ export default function App() {
     addAudit('Order Archived', { po: id });
     setPurchaseOrders(prev => prev.map(o => o.id === id ? { ...o, isArchived: true } : o));
 
-    // CASCADE: Archive linked receipts
+    // CASCADE: Archive linked receipts (write directly to localStorage — state lives in ReceiptManagement)
     const poHeaders = receiptHeaders.filter(h => h.bestellNr === id);
     if (poHeaders.length > 0) {
-      setArchivedReceiptGroups(prev => {
-        const next = new Set(prev);
-        next.add(id);
-        localStorage.setItem('archivedReceiptGroups', JSON.stringify([...next]));
-        return next;
-      });
+      try {
+        const saved = localStorage.getItem('archivedReceiptGroups');
+        const archived: Set<string> = saved ? new Set(JSON.parse(saved)) : new Set();
+        archived.add(id);
+        localStorage.setItem('archivedReceiptGroups', JSON.stringify([...archived]));
+      } catch (e) { /* localStorage unavailable */ }
     }
 
     // CASCADE: Close all linked open tickets
@@ -512,13 +512,13 @@ export default function App() {
     setReceiptMasters(prev => prev.map(m => m.poId === id ? { ...m, status: 'Abgeschlossen' as ReceiptMasterStatus } : m));
     setReceiptHeaders(prev => prev.map(h => h.bestellNr === id ? { ...h, status: 'Storniert' } : h));
 
-    // 3. CASCADE: Auto-archive receipt
-    setArchivedReceiptGroups(prev => {
-      const next = new Set(prev);
-      next.add(id);
-      localStorage.setItem('archivedReceiptGroups', JSON.stringify([...next]));
-      return next;
-    });
+    // 3. CASCADE: Auto-archive receipt (write directly to localStorage — state lives in ReceiptManagement)
+    try {
+      const saved = localStorage.getItem('archivedReceiptGroups');
+      const archived: Set<string> = saved ? new Set(JSON.parse(saved)) : new Set();
+      archived.add(id);
+      localStorage.setItem('archivedReceiptGroups', JSON.stringify([...archived]));
+    } catch (e) { /* localStorage unavailable */ }
 
     // 4. CASCADE: Close all linked tickets
     const linkedBatchIds = receiptHeaders.filter(h => h.bestellNr === id).map(h => h.batchId);
