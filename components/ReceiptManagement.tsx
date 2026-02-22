@@ -763,36 +763,7 @@ export const ReceiptManagement: React.FC<ReceiptManagementProps> = ({
       });
     }
 
-    // ARCHIVE BUTTON - Only for completed receipts with no open tickets (always allow unarchive)
-    if (activeHeader) {
-      const archiveKey = activeHeader.bestellNr || activeHeader.batchId;
-      const isCurrentlyArchived = archivedReceiptGroups.has(archiveKey);
-      const archiveStatus = (activeMaster?.status || activeHeader?.status || '').toLowerCase().trim();
-      const isCompleted = ['gebucht', 'abgeschlossen', 'in bearbeitung', 'erledigt'].includes(archiveStatus);
-      const archiveTickets = activeHeader.bestellNr
-        ? tickets.filter(t => { const h = headers.find(hdr => hdr.batchId === t.receiptId); return h?.bestellNr === activeHeader.bestellNr; })
-        : tickets.filter(t => t.receiptId === activeHeader.batchId);
-      const hasOpenCases = archiveTickets.some(t => t.status === 'Open');
-      const canArchive = isCurrentlyArchived || (isCompleted && !hasOpenCases);
-      if (canArchive) actions.push({
-        key: 'archive',
-        label: isCurrentlyArchived ? 'Aus Archiv holen' : 'Archivieren',
-        icon: Archive,
-        onClick: (e: React.MouseEvent) => {
-          e.stopPropagation();
-          const key = activeHeader.bestellNr || activeHeader.batchId;
-          setArchivedReceiptGroups(prev => {
-            const next = new Set(prev);
-            if (next.has(key)) next.delete(key); else next.add(key);
-            localStorage.setItem('archivedReceiptGroups', JSON.stringify([...next]));
-            return next;
-          });
-        },
-        variant: 'ghost',
-        tooltip: isCurrentlyArchived ? 'Archivierung aufheben' : 'In Archiv verschieben'
-      });
-    }
-
+    
     if (actions.length === 0) return null;
 
     // UNIFIED: Single three-dot menu for both mobile and desktop

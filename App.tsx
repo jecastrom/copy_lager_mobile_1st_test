@@ -473,6 +473,28 @@ export default function App() {
   const handleArchiveOrder = (id: string) => {
     addAudit('Order Archived', { po: id });
     setPurchaseOrders(prev => prev.map(o => o.id === id ? { ...o, isArchived: true } : o));
+
+    // CASCADE: Archive linked receipts
+    const poHeaders = receiptHeaders.filter(h => h.bestellNr === id);
+    if (poHeaders.length > 0) {
+      setArchivedReceiptGroups(prev => {
+        const next = new Set(prev);
+        next.add(id);
+        localStorage.setItem('archivedReceiptGroups', JSON.stringify([...next]));
+        return next;
+      });
+    }
+
+    // CASCADE: Close all linked open tickets
+    const linkedBatchIds = poHeaders.map(h => h.batchId);
+    if (linkedBatchIds.length > 0) {
+      setTickets(prev => prev.map(t => {
+        if (linkedBatchIds.includes(t.receiptId) && t.status === 'Open') {
+          return { ...t, status: 'Closed' as const, messages: [...t.messages, { id: crypto.randomUUID(), author: 'System', text: 'Ticket automatisch geschlossen — Bestellung archiviert.', timestamp: Date.now(), type: 'system' as const }] };
+        }
+        return t;
+      }));
+    }
   };
 
   const handleCancelOrder = (id: string) => {
@@ -483,6 +505,21 @@ export default function App() {
       }
       return o;
     }));
+
+    // CASCADE: Set linked receipt to Storniert + archived
+    setReceiptMasters(prev => prev.map(m => m.poId === id ? { ...m, status: 'Abgeschlossen' as ReceiptMasterStatus } : m));
+    setReceiptHeaders(prev => prev.map(h => h.bestellNr === id ? { ...h, status: 'Storniert' } : h));
+
+    // CASCADE: Close all linked tickets
+    const linkedBatchIds = receiptHeaders.filter(h => h.bestellNr === id).map(h => h.batchId);
+    if (linkedBatchIds.length > 0) {
+      setTickets(prev => prev.map(t => {
+        if (linkedBatchIds.includes(t.receiptId) && t.status === 'Open') {
+          return { ...t, status: 'Closed' as const, messages: [...t.messages, { id: crypto.randomUUID(), author: 'System', text: 'Ticket automatisch geschlossen — Bestellung storniert.', timestamp: Date.now(), type: 'system' as const }] };
+        }
+        return t;
+      }));
+    }
   };
 
   const handleEditOrder = (order: PurchaseOrder) => {

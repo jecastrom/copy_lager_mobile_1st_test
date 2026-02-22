@@ -306,6 +306,27 @@ export const RECEIPT_STATUS_CONFIG: Record<ReceiptMasterStatus, StatusConfig> = 
         badge: 'bg-red-500/10 text-red-400 border-red-500/20'
       }
     }
+  },
+
+  'Storniert': {
+    key: 'storniert',
+    displayName: 'Storniert',
+    description: 'Bestellung wurde storniert. Keine weiteren Aktionen möglich.',
+    icon: Ban,
+    colorClass: {
+      light: {
+        bg: 'bg-slate-100',
+        text: 'text-slate-500',
+        border: 'border-slate-200',
+        badge: 'bg-slate-100 text-slate-500 border-slate-200'
+      },
+      dark: {
+        bg: 'bg-slate-800',
+        text: 'text-slate-500',
+        border: 'border-slate-700',
+        badge: 'bg-slate-800 text-slate-500 border-slate-700'
+      }
+    }
   }
 };
 
@@ -340,6 +361,7 @@ export function getStatusConfig(status: string | undefined): StatusConfig | null
   if (normalized.includes('übermenge') || normalized === 'zu viel') return RECEIPT_STATUS_CONFIG['Übermenge'];
   if (normalized.includes('gebucht') || normalized === 'abgeschlossen' || normalized === 'in bearbeitung') return RECEIPT_STATUS_CONFIG['Gebucht'];
   if (normalized === 'offen') return RECEIPT_STATUS_CONFIG['Offen'];
+  if (normalized === 'storniert') return RECEIPT_STATUS_CONFIG['Storniert'];
   if (normalized.includes('morgen')) return RECEIPT_STATUS_CONFIG['Lieferung morgen'];
   if (normalized.includes('heute')) return RECEIPT_STATUS_CONFIG['Lieferung heute'];
   if (normalized.includes('verspätet') || normalized.includes('überfällig')) return RECEIPT_STATUS_CONFIG['Verspätet'];

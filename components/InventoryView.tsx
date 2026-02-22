@@ -440,7 +440,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
             <Search className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${isDark ? 'text-slate-500 group-focus-within:text-blue-400' : 'text-slate-400 group-focus-within:text-[#0077B5]'}`} size={20} />
             <input 
               type="text"
-              placeholder="Suchen nach Name, SKU oder System..."
+              placeholder="Suchen nach Name, Artikelnummer oder System..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full border rounded-2xl pl-12 pr-4 py-4 text-lg transition-all focus:outline-none focus:ring-2 ${

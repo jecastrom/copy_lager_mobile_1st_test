@@ -134,7 +134,7 @@ export interface DeliveryLog {
   isStorniert?: boolean;
 }
 
-export type ReceiptMasterStatus = 'Offen' | 'Abgeschlossen' | 'Wartet auf Lieferung' | 'Gebucht' | 'Teillieferung' | 'Schaden' | 'Abgelehnt' | 'Falsch geliefert' | 'Schaden + Falsch' | 'Übermenge' | 'Lieferung morgen' | 'Lieferung heute' | 'Verspätet';
+export type ReceiptMasterStatus = 'Offen' | 'Abgeschlossen' | 'Wartet auf Lieferung' | 'Gebucht' | 'Teillieferung' | 'Schaden' | 'Abgelehnt' | 'Falsch geliefert' | 'Schaden + Falsch' | 'Übermenge' | 'Lieferung morgen' | 'Lieferung heute' | 'Verspätet' | 'Storniert';
 
 export interface ReceiptMaster {
   id: string;
