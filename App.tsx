@@ -330,7 +330,7 @@ export default function App() {
       if (header?.bestellNr) {
         const poId = header.bestellNr;
         const master = receiptMasters.find(m => m.poId === poId);
-        const wasPreReceipt = master?.status === 'Wartet auf Lieferung';
+        const wasPreReceipt = master?.status === 'Wartet auf Lieferung' || master?.status === 'Lieferung morgen' || master?.status === 'Lieferung heute' || master?.status === 'Verspätet';
 
         if (wasPreReceipt) {
           // PRE-RECEIPT CANCEL: No goods were received — reset PO to Offen
@@ -441,6 +441,21 @@ export default function App() {
 
       // Link receipt to PO
       order = { ...order, linkedReceiptId: batchId };
+    }
+
+    // --- RECALCULATE RECEIPT STATUS on EDIT ---
+    if (exists) {
+      const linkedMaster = receiptMasters.find(m => m.poId === order.id);
+      if (linkedMaster) {
+        const currentStatus = linkedMaster.status;
+        const isPreReceiptStatus = ['Wartet auf Lieferung', 'Lieferung morgen', 'Lieferung heute', 'Verspätet'].includes(currentStatus);
+        if (isPreReceiptStatus) {
+          const dateBadge = getDeliveryDateBadge(order.expectedDeliveryDate, 'Offen');
+          const newStatus: string = dateBadge || 'Wartet auf Lieferung';
+          setReceiptMasters(prev => prev.map(m => m.poId === order.id ? { ...m, status: newStatus as ReceiptMasterStatus } : m));
+          setReceiptHeaders(prev => prev.map(h => h.bestellNr === order.id ? { ...h, status: newStatus } : h));
+        }
+      }
     }
 
     setPurchaseOrders(prev => {
