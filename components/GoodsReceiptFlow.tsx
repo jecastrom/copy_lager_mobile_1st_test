@@ -394,6 +394,10 @@ export const GoodsReceiptFlow: React.FC<GoodsReceiptFlowProps> = ({
   const [finalResultStatus, setFinalResultStatus] = useState('');
   const [linkedPoId, setLinkedPoId] = useState<string | null>(null);
   const [showPoModal, setShowPoModal] = useState(false);
+  const [showLagerortSheet, setShowLagerortSheet] = useState(false);
+  const [lagerortSheetSearch, setLagerortSheetSearch] = useState('');
+  const [showAddNewLagerort, setShowAddNewLagerort] = useState(false);
+  const [newLagerortName, setNewLagerortName] = useState('');
   const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [forceClose, setForceClose] = useState(false);
   const [isAdminClose, setIsAdminClose] = useState(false);
@@ -938,14 +942,21 @@ export const GoodsReceiptFlow: React.FC<GoodsReceiptFlowProps> = ({
               </div>
             )}
 
-            <SearchableDropdown
-  value={headerData.warehouseLocation}
-  onChange={(val) => setHeaderData(prev => ({...prev, warehouseLocation: val}))}
-  options={lagerortOptions}
-  onAddNew={(newLoc) => setLagerortOptions(prev => [...prev, newLoc])}
-  label="Lagerort"
-  isDark={isDark}
-/>
+            <div>
+              <label className={`text-sm font-bold block mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Lagerort</label>
+              <button
+                type="button"
+                onClick={() => setShowLagerortSheet(true)}
+                className={`w-full px-4 py-3 rounded-xl border flex items-center justify-between transition-all ${
+                  isDark 
+                    ? 'bg-slate-900 border-slate-700 text-white hover:border-slate-600' 
+                    : 'bg-white border-slate-300 hover:border-slate-400'
+                }`}
+              >
+                <span className={headerData.warehouseLocation ? '' : 'opacity-50'}>{headerData.warehouseLocation || 'Wählen...'}</span>
+                <ChevronDown size={18} />
+              </button>
+            </div>
 
             <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
               <div className="flex items-center justify-between mb-3">
@@ -971,16 +982,7 @@ export const GoodsReceiptFlow: React.FC<GoodsReceiptFlowProps> = ({
               )}
             </div>
 
-            {linkedPoId && (
-              <div className={`p-4 rounded-xl border flex items-center gap-4 text-left cursor-pointer transition-colors ${isAdminClose ? (isDark ? 'bg-purple-500/10 border-purple-500/30' : 'bg-purple-50 border-purple-200') : (isDark ? 'bg-slate-800/50 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-200 hover:border-slate-300')}`} onClick={() => handleAdminCloseToggle(!isAdminClose)}>
-                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isAdminClose ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-400'}`}>{isAdminClose && <Check size={14} strokeWidth={3} />}</div>
-                <div className="flex-1">
-                  <div className={`font-bold text-sm ${isAdminClose ? 'text-purple-600 dark:text-purple-400' : ''}`}>Admin-Modus: Bestellung ohne Lieferung schließen</div>
-                  <div className="text-xs opacity-60">Liefermenge auf 0 setzen, dann manuell abschließen.</div>
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
         )}
 
         {/* STEP 2 - INSPECTION */}
@@ -1375,16 +1377,153 @@ export const GoodsReceiptFlow: React.FC<GoodsReceiptFlowProps> = ({
       </div>
 
       {/* STICKY FOOTER - PINNED TO BOTTOM */}
-      <div className={`sticky bottom-0 z-10 p-4 md:p-5 border-t flex justify-between shrink-0 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-        {step > 1 ? <button onClick={() => { if (initialMode === 'return' && step === 3) { onClose(); } else { setStep(prev => (prev - 1) as any); } }} className="px-6 py-3 rounded-xl font-bold bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{initialMode === 'return' && step === 3 ? 'Schließen' : 'Zurück'}</button> : <div/>}
-        {step < 3 ? (
-          <button onClick={() => setStep(prev => (prev + 1) as any)} disabled={step === 1 ? !headerData.lieferscheinNr : cart.length === 0} className="px-8 py-3 bg-[#0077B5] text-white rounded-xl font-bold disabled:opacity-50">Weiter</button>
-        ) : (
-          <button onClick={() => { setSubmissionStatus('submitting'); setTimeout(() => setSubmissionStatus('success'), 800); }} className="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-500">Buchen</button>
-        )}
+      <div className={`sticky bottom-0 z-10 border-t shrink-0 ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
+        <div className="px-4 md:px-5 pt-3 flex gap-3">
+          {step > 1 && (
+            <button onClick={() => { if (initialMode === 'return' && step === 3) { onClose(); } else { setStep(prev => (prev - 1) as any); } }} className="px-5 py-3 rounded-xl font-bold bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 shrink-0">
+              {initialMode === 'return' && step === 3 ? 'Schließen' : 'Zurück'}
+            </button>
+          )}
+          {step < 3 ? (
+            <button onClick={() => setStep(prev => (prev + 1) as any)} disabled={step === 1 ? !headerData.lieferscheinNr : cart.length === 0}
+              className={`flex-1 py-3 rounded-xl font-bold inline-flex items-center justify-center gap-2 transition-all active:scale-[0.97] text-white ${
+                (step === 1 ? headerData.lieferscheinNr : cart.length > 0) ? 'bg-[#0077B5] hover:bg-[#005f8f] shadow-md shadow-blue-500/25' : 'bg-slate-300 dark:bg-slate-700 shadow-none cursor-not-allowed'
+              }`}>
+              Weiter <ArrowRight size={16} strokeWidth={2.5} />
+            </button>
+          ) : (
+            <button onClick={() => { setSubmissionStatus('submitting'); setTimeout(() => setSubmissionStatus('success'), 800); }}
+              className="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-500 inline-flex items-center justify-center gap-2 transition-all active:scale-[0.97] shadow-md shadow-emerald-500/25">
+              <CheckCircle2 size={16} /> Bestätigen
+            </button>
+          )}
+        </div>
       </div>
 
       <POSelectionModal isOpen={showPoModal} onClose={() => setShowPoModal(false)} orders={purchaseOrders || MOCK_PURCHASE_ORDERS} receiptMasters={receiptMasters} onSelect={handleSelectPO} theme={theme} />
+
+      {/* LAGERORT BOTTOM SHEET */}
+      {showLagerortSheet && createPortal(
+        <div className="fixed inset-0 z-[100000] flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => { setShowLagerortSheet(false); setLagerortSheetSearch(''); setShowAddNewLagerort(false); setNewLagerortName(''); }} />
+          <div className={`relative rounded-t-3xl shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300 ${isDark ? 'bg-slate-900' : 'bg-white'}`} style={{ maxHeight: '85vh' }}>
+            {/* Handle bar */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className={`w-10 h-1 rounded-full ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`} />
+            </div>
+            {/* Header */}
+            <div className="px-5 pb-3 flex items-center justify-between">
+              <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Lagerort wählen</h3>
+              <button onClick={() => { setShowLagerortSheet(false); setLagerortSheetSearch(''); setShowAddNewLagerort(false); setNewLagerortName(''); }} className={`p-2 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}>
+                <ChevronDown size={20} />
+              </button>
+            </div>
+            {/* Search */}
+            <div className={`px-5 pb-3 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+              <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                <Search size={16} className="opacity-50 shrink-0" />
+                <input
+                  type="text"
+                  value={lagerortSheetSearch}
+                  onChange={(e) => setLagerortSheetSearch(e.target.value)}
+                  placeholder="Suchen..."
+                  className="flex-1 bg-transparent outline-none text-sm"
+                  autoFocus
+                />
+                {lagerortSheetSearch && (
+                  <button onClick={() => setLagerortSheetSearch('')} className="opacity-50 hover:opacity-100"><X size={14} /></button>
+                )}
+              </div>
+            </div>
+            {/* Options list */}
+            <div className="flex-1 overflow-y-auto">
+              {(() => {
+                const filtered = lagerortSheetSearch
+                  ? lagerortOptions.filter(o => o.toLowerCase().includes(lagerortSheetSearch.toLowerCase()))
+                  : lagerortOptions;
+                return filtered.length > 0 ? filtered.map((opt, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setHeaderData(prev => ({ ...prev, warehouseLocation: opt }));
+                      setShowLagerortSheet(false);
+                      setLagerortSheetSearch('');
+                    }}
+                    className={`w-full px-5 py-3.5 text-left text-sm transition-colors flex items-center justify-between border-b ${
+                      headerData.warehouseLocation === opt
+                        ? isDark ? 'bg-blue-500/20 text-blue-400 border-slate-800' : 'bg-blue-50 text-blue-600 border-slate-100'
+                        : isDark ? 'hover:bg-slate-800 border-slate-800' : 'hover:bg-slate-50 border-slate-100'
+                    }`}
+                  >
+                    <span>{opt}</span>
+                    {headerData.warehouseLocation === opt && <Check size={16} />}
+                  </button>
+                )) : (
+                  <div className="p-6 text-center text-sm opacity-50">Keine Ergebnisse</div>
+                );
+              })()}
+            </div>
+            {/* Add new Lagerort */}
+            <div className={`p-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}
+              style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}>
+              {!showAddNewLagerort ? (
+                <button
+                  type="button"
+                  onClick={() => setShowAddNewLagerort(true)}
+                  className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border transition-colors ${
+                    isDark ? 'border-slate-700 hover:bg-slate-800 text-blue-400' : 'border-slate-200 hover:bg-slate-50 text-blue-600'
+                  }`}
+                >
+                  <Plus size={16} /> Neuer Lagerort
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newLagerortName}
+                    onChange={(e) => setNewLagerortName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && newLagerortName.trim()) {
+                        setLagerortOptions(prev => [...prev, newLagerortName.trim()]);
+                        setHeaderData(prev => ({ ...prev, warehouseLocation: newLagerortName.trim() }));
+                        setNewLagerortName('');
+                        setShowAddNewLagerort(false);
+                        setShowLagerortSheet(false);
+                        setLagerortSheetSearch('');
+                      }
+                    }}
+                    placeholder="Neuer Lagerort..."
+                    className={`flex-1 px-3 py-2.5 rounded-xl border text-sm outline-none ${
+                      isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'
+                    }`}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newLagerortName.trim()) {
+                        setLagerortOptions(prev => [...prev, newLagerortName.trim()]);
+                        setHeaderData(prev => ({ ...prev, warehouseLocation: newLagerortName.trim() }));
+                        setNewLagerortName('');
+                        setShowAddNewLagerort(false);
+                        setShowLagerortSheet(false);
+                        setLagerortSheetSearch('');
+                      }
+                    }}
+                    disabled={!newLagerortName.trim()}
+                    className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold disabled:opacity-50 hover:bg-blue-500"
+                  >
+                    <Check size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };
