@@ -264,7 +264,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
           supplier: r.supplier || 'Unbekannt',
           dateCreated: r.orderDate,
           expectedDeliveryDate: r.expectedDeliveryDate || '',
-          status: r.poType === 'project' ? 'Projekt' : 'Lager',
+          status: (r as any).poType === 'project' ? 'Projekt' : 'Lager',
           isArchived: false,
           items: r.items.map(c => ({ sku: c.sku, name: c.name, quantityExpected: c.quantity, quantityReceived: 0 }))
         };
@@ -279,7 +279,7 @@ export const CreateOrderWizard: React.FC<CreateOrderWizardProps> = ({
 
     // SINGLE MODE: fill wizard (existing behavior)
     const r = allParsed[0] || parsePOText(importText, items);
-    const parsedType = r.poType === 'project' ? 'project' : r.poType === 'normal' ? 'normal' : null;
+    const parsedType = (r as any).poType === 'project' ? 'project' : (r as any).poType === 'normal' ? 'normal' : null;
     setFormData(p => ({ ...p, orderId: r.orderId || p.orderId, orderDate: r.orderDate || p.orderDate, supplier: r.supplier || p.supplier, expectedDeliveryDate: r.expectedDeliveryDate || p.expectedDeliveryDate, poType: parsedType || p.poType }));
     if (r.items.length > 0) { setCart(r.items); alert(`${r.items.length} Positionen erkannt und importiert.`); } else alert("Keine bekannten Artikel im Text gefunden.");
     setShowImportModal(false); setImportText('');
